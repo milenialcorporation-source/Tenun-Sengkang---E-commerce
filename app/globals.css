@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-primary: #ffcc29;
+  --color-secondary: #000000;
+  --color-accent: #f58634;
+  --color-background: #ffffff;
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-secondary);
+  font-family: var(--font-sans);
+}
