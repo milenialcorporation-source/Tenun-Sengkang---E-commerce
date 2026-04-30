@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Config": {
+      "title": "Site Configuration",
+      "description": "Global website configuration state including hero slides, products, collections, logo etc.",
+      "type": "object",
+      "properties": {
+        "heroSlides": {
+          "type": "array",
+          "items": { "$ref": "#/entities/HeroSlide" }
+        },
+        "collections": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Collection" }
+        },
+        "products": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Product" }
+        },
+        "showOlsera": { "type": "boolean" },
+        "profileSlides": {
+          "type": "array",
+          "items": { "$ref": "#/entities/ImageInput" }
+        },
+        "featuredSections": {
+          "type": "array"
+        },
+        "megaMenuCards": {
+          "type": "array"
+        },
+        "logo": { "$ref": "#/entities/ImageInput" }
+      }
+    }
+  },
+  "firestore": {
+    "/config/main": {
+      "schema": { "$ref": "Config" },
+      "description": "The main configuration document containing all dynamic UI data for the website."
+    }
+  }
+}

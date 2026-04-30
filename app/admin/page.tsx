@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { ImageInput, HeroSlide, Collection, Product } from '@/lib/types';
 import Image from 'next/image';
-import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut } from 'lucide-react';
+import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw } from 'lucide-react';
+import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const handleImageUpload = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -18,36 +20,65 @@ const handleImageUpload = (file: File): Promise<string> => {
 type Tab = 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'profile' | 'collections' | 'products' | 'catalog';
 
 export default function AdminDashboard() {
-  const { state, setState } = useStore();
+  const { state, savedState, setState, saveToDb, discardChanges } = useStore();
   const [activeTab, setActiveTab] = useState<Tab>('logo');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Check session storage on mount
-  React.useEffect(() => {
-    const auth = sessionStorage.getItem('adminAuth');
-    if (auth === 'true') {
-      queueMicrotask(() => setIsAuthenticated(true));
-    }
+  const hasChanges = JSON.stringify(state) !== JSON.stringify(savedState);
+
+  // Check auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.email === 'azkarmsd@gmail.com') {
+        setIsAuthenticated(true);
+      } else {
+        if (user) signOut(auth);
+        setIsAuthenticated(false);
+      }
+      setIsAuthChecking(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123')) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('adminAuth', 'true');
-      setError('');
-    } else {
-      setError('Invalid password');
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setError('');
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in');
+      console.error(err);
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('adminAuth');
-    setPassword('');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Error signing out', err);
+    }
   };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveToDb();
+      alert('Changes saved successfully!');
+    } catch (err: any) {
+      alert('Failed to save changes: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isAuthChecking) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p>Checking admin status...</p></div>;
+  }
 
   if (!isAuthenticated) {
     return (
@@ -56,22 +87,16 @@ export default function AdminDashboard() {
           <h1 className="font-serif text-2xl text-center mb-2">Admin Access</h1>
           <p className="text-xs text-gray-500 text-center mb-6 uppercase tracking-widest">Restricted Area</p>
           
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <input 
-                type="password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Enter admin password" 
-                className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black bg-gray-50 focus:bg-white transition-colors"
-                autoFocus
-              />
-            </div>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-            <button className="w-full bg-black text-white py-3 text-sm font-semibold uppercase tracking-widest hover:bg-gray-800 transition-colors">
-              Access Dashboard
+          <div className="space-y-4">
+            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+            <button 
+              onClick={handleLogin}
+              className="w-full bg-black text-white py-3 text-sm font-semibold uppercase tracking-widest hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+            >
+              Sign In with Google
             </button>
-          </form>
+            <p className="text-xs text-gray-400 text-center mt-2">Only authorized administrators may log in.</p>
+          </div>
         </div>
       </div>
     );
@@ -95,7 +120,18 @@ export default function AdminDashboard() {
           <TabButton active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Box size={18} />} label="Products" />
           <TabButton active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} icon={<ToggleLeft size={18} />} label="Catalog Control" />
         </nav>
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          {hasChanges && (
+            <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-4 space-y-2">
+               <p className="text-xs text-amber-800 font-medium">Unsaved changes!</p>
+               <button onClick={handleSave} disabled={isSaving} className="w-full flex items-center justify-center gap-2 bg-amber-500 text-white py-2 rounded text-xs font-semibold hover:bg-amber-600 transition-colors">
+                  <Save size={14} /> {isSaving ? 'Saving...' : 'Save Changes'}
+               </button>
+               <button onClick={discardChanges} disabled={isSaving} className="w-full flex items-center justify-center gap-2 bg-white border border-amber-300 text-amber-800 py-2 rounded text-xs font-semibold hover:bg-amber-100 transition-colors">
+                  <RotateCcw size={14} /> Discard
+               </button>
+            </div>
+          )}
           <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
