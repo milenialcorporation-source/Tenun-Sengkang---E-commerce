@@ -7,14 +7,16 @@ service cloud.firestore {
 
     function incoming() { return request.resource.data; }
     function isSignedIn() { return request.auth != null; }
-    function isAdmin() { return isSignedIn() && request.auth.token.email == 'azkarmsd@gmail.com' && request.auth.token.email_verified == true; }
+    function isAdmin() { return isSignedIn() && request.auth.token.email == 'azkarmsd@gmail.com'; }
 
     function isValidConfig(data) {
-      return data.keys().hasAll(['heroSlides', 'collections', 'products', 'showOlsera'])
+      return data.keys().hasAll(['heroSlides', 'collections', 'products', 'showOlsera', 'hamburgerProducts', 'hamburgerCollections'])
           && data.showOlsera is bool
           && data.heroSlides is list
           && data.collections is list
-          && data.products is list;
+          && data.products is list
+          && data.hamburgerProducts is list
+          && data.hamburgerCollections is list;
     }
 
     match /config/main {

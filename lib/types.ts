@@ -56,4 +56,6 @@ export type StoreState = {
   profileSlides: ImageInput[];
   featuredSections: FeaturedSection[];
   megaMenuCards: MegaMenuCard[];
+  hamburgerProducts: string[];
+  hamburgerCollections: string[];
 };

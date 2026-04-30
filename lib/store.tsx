@@ -13,6 +13,8 @@ const defaultState: StoreState = {
   profileSlides: [],
   featuredSections: [],
   megaMenuCards: [],
+  hamburgerProducts: [],
+  hamburgerCollections: [],
 };
 
 type StoreContextType = {
@@ -39,11 +41,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data() as StoreState;
-        setSavedState(data);
-        setLocalState(data); // Sync local state when remote updates
+        const mergedData = { ...defaultState, ...data };
+        setSavedState(mergedData);
+        setLocalState(mergedData); // Sync local state when remote updates
       } else {
         // Initialize if it doesn't exist
-        setDoc(docRef, defaultState).catch(console.error);
+        setDoc(docRef, defaultState).catch((err) => {
+          // Ignore permission-denied errors on initialization (expected for non-admins)
+          if (err.code !== 'permission-denied') {
+            console.error('Failed to initialize config:', err);
+          }
+        });
       }
       setIsLoaded(true);
     }, (error) => {

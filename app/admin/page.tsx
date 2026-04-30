@@ -17,7 +17,7 @@ const handleImageUpload = (file: File): Promise<string> => {
   });
 };
 
-type Tab = 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'profile' | 'collections' | 'products' | 'catalog';
+type Tab = 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' | 'profile' | 'collections' | 'products' | 'catalog';
 
 export default function AdminDashboard() {
   const { state, savedState, setState, saveToDb, discardChanges } = useStore();
@@ -115,6 +115,7 @@ export default function AdminDashboard() {
           <TabButton active={activeTab === 'hero'} onClick={() => setActiveTab('hero')} icon={<Layout size={18} />} label="Homepage Slides" />
           <TabButton active={activeTab === 'featuredSections'} onClick={() => setActiveTab('featuredSections')} icon={<Layout size={18} />} label="Featured Sections" />
           <TabButton active={activeTab === 'megaMenu'} onClick={() => setActiveTab('megaMenu')} icon={<Layout size={18} />} label="Mega Menu Cards" />
+          <TabButton active={activeTab === 'hamburgerMenu'} onClick={() => setActiveTab('hamburgerMenu')} icon={<Layout size={18} />} label="Hamburger Menu" />
           <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<ImageIcon size={18} />} label="Profile Slides" />
           <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={<FolderPlus size={18} />} label="Collections/Category" />
           <TabButton active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Box size={18} />} label="Products" />
@@ -148,6 +149,7 @@ export default function AdminDashboard() {
           {activeTab === 'hero' && <HeroManager state={state} setState={setState} />}
           {activeTab === 'featuredSections' && <FeaturedSectionManager state={state} setState={setState} />}
           {activeTab === 'megaMenu' && <MegaMenuManager state={state} setState={setState} />}
+          {activeTab === 'hamburgerMenu' && <HamburgerMenuManager state={state} setState={setState} />}
           {activeTab === 'profile' && <ProfileSlideManager state={state} setState={setState} />}
           {activeTab === 'collections' && <CollectionManager state={state} setState={setState} />}
           {activeTab === 'products' && <ProductManager state={state} setState={setState} />}
@@ -729,6 +731,64 @@ function MegaMenuManager({ state, setState }: any) {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function HamburgerMenuManager({ state, setState }: any) {
+  const updateHamburgerSelections = (field: 'hamburgerProducts' | 'hamburgerCollections', selectedIds: string[]) => {
+    setState((s: any) => ({
+      ...s,
+      [field]: selectedIds
+    }));
+  };
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-lg font-semibold mb-1">Hamburger Menu Configuration</h3>
+        <p className="text-sm text-gray-500 mb-6">Select which products and categories should appear directly under the hamburger menu options.</p>
+      </div>
+
+      <div className="space-y-8">
+        <div className="p-6 border border-gray-200 rounded-md bg-gray-50">
+          <h4 className="font-semibold text-gray-800 mb-2">Products in Hamburger Menu</h4>
+          <p className="text-xs text-gray-500 mb-4">Select the specific products you want to show in the &quot;Products&quot; dropdown in the hamburger menu.</p>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Select Products (Ctrl/Cmd+Click to multi-select)</label>
+          <select 
+            multiple 
+            value={state.hamburgerProducts || []} 
+            onChange={e => {
+              const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+              updateHamburgerSelections('hamburgerProducts', selected);
+            }} 
+            className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm bg-white min-h-[160px]"
+          >
+            {state.products.map((p: any) => (
+              <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="p-6 border border-gray-200 rounded-md bg-gray-50">
+          <h4 className="font-semibold text-gray-800 mb-2">Collections in Hamburger Menu</h4>
+          <p className="text-xs text-gray-500 mb-4">Select the categories you want to show in the &quot;Collections&quot; dropdown in the hamburger menu.</p>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Select Collections (Ctrl/Cmd+Click to multi-select)</label>
+          <select 
+            multiple 
+            value={state.hamburgerCollections || []} 
+            onChange={e => {
+              const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+              updateHamburgerSelections('hamburgerCollections', selected);
+            }} 
+            className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm bg-white min-h-[160px]"
+          >
+            {state.collections.map((c: any) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

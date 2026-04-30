@@ -12,6 +12,7 @@ export default function Navbar() {
   const { state } = useStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +42,9 @@ export default function Navbar() {
   };
 
   const logoSrc = getLogo();
+
+  const hProducts = state.products.filter(p => state.hamburgerProducts?.includes(p.id));
+  const hCollections = state.collections.filter(c => state.hamburgerCollections?.includes(c.id));
 
   return (
     <>
@@ -221,34 +225,61 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <button className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group">
+                    <button 
+                      onClick={() => setExpandedMenu(expandedMenu === 'products' ? null : 'products')}
+                      className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group"
+                    >
                       <span>Products</span>
-                      <ChevronRight className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-all" strokeWidth={1.5} />
+                      <ChevronRight className={`w-5 h-5 opacity-40 group-hover:opacity-100 transition-all ${expandedMenu === 'products' ? 'rotate-90' : ''}`} strokeWidth={1.5} />
                     </button>
+                    <AnimatePresence>
+                      {expandedMenu === 'products' && (
+                        <motion.ul 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="pl-4 mt-4 space-y-4 overflow-hidden"
+                        >
+                          {hProducts.map((product) => (
+                            <li key={product.id}>
+                              <Link href={`/product/${product.id}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={() => setIsMenuOpen(false)}>
+                                {product.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </li>
                   <li>
-                    <button className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group">
+                    <button 
+                      onClick={() => setExpandedMenu(expandedMenu === 'collections' ? null : 'collections')}
+                      className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group"
+                    >
                       <span>Collections</span>
-                      <ChevronRight className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-all" strokeWidth={1.5} />
+                      <ChevronRight className={`w-5 h-5 opacity-40 group-hover:opacity-100 transition-all ${expandedMenu === 'collections' ? 'rotate-90' : ''}`} strokeWidth={1.5} />
                     </button>
+                    <AnimatePresence>
+                      {expandedMenu === 'collections' && (
+                        <motion.ul 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="pl-4 mt-4 space-y-4 overflow-hidden"
+                        >
+                          {hCollections.map((col) => (
+                            <li key={col.id}>
+                              <Link href={`/shop?category=${encodeURIComponent(col.name)}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={() => setIsMenuOpen(false)}>
+                                {col.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </li>
-                  <li>
-                    <Link href="/shop" className="text-xl font-serif text-[#d28b8b] hover:text-[#b87171] transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      The Vault
-                    </Link>
-                  </li>
-                  <li className="pt-4 border-t border-gray-100">
-                    <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      Lookbooks
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      World of Kain Sutra
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                  <li className="pt-6 border-t border-gray-100 mt-6">
+                    <Link href="/profile" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       Our Story
                     </Link>
                   </li>
