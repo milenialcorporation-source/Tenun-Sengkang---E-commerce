@@ -40,11 +40,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const loadState = async () => {
       try {
         // Try fetching from MySQL via our API route
-        const response = await fetch('/api/state', { cache: 'no-store' });
+        const response = await fetch('/api/state?t=' + Date.now(), { 
+          cache: 'no-store'
+        });
+
         if (response.ok) {
           const fetchedState = await response.json();
           if (Object.keys(fetchedState).length > 0) {
              const mergedData = { ...defaultState, ...fetchedState };
+             // Ensure arrays are present to avoid crashes
+             mergedData.heroSlides = mergedData.heroSlides || [];
+             mergedData.collections = mergedData.collections || [];
+             mergedData.products = mergedData.products || [];
+             mergedData.featuredSections = mergedData.featuredSections || [];
+             mergedData.megaMenuCards = mergedData.megaMenuCards || [];
+             mergedData.hamburgerProducts = mergedData.hamburgerProducts || [];
+             mergedData.hamburgerCollections = mergedData.hamburgerCollections || [];
+             mergedData.storyImages = mergedData.storyImages || [];
+
              setSavedState(mergedData);
              setLocalState(mergedData);
              setIsLoaded(true);
@@ -61,6 +74,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (stored) {
           const parsed = JSON.parse(stored) as StoreState;
           const mergedData = { ...defaultState, ...parsed };
+             mergedData.heroSlides = mergedData.heroSlides || [];
+             mergedData.collections = mergedData.collections || [];
+             mergedData.products = mergedData.products || [];
+             mergedData.featuredSections = mergedData.featuredSections || [];
+             mergedData.megaMenuCards = mergedData.megaMenuCards || [];
+             mergedData.hamburgerProducts = mergedData.hamburgerProducts || [];
+             mergedData.hamburgerCollections = mergedData.hamburgerCollections || [];
+             mergedData.storyImages = mergedData.storyImages || [];
           setSavedState(mergedData);
           setLocalState(mergedData);
         }
@@ -106,7 +127,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (!isLoaded) return null; // Or a loader
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <StoreContext.Provider value={{ state, setState, savedState, isLoaded, saveToDb, discardChanges }}>
