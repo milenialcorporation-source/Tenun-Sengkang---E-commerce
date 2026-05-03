@@ -96,7 +96,7 @@ function ShopContent() {
                   />
                   {(Array.isArray(product.images) && product.images.length > 0) && (
                     <Image
-                      src={product.images[0].data}
+                      src={product.images[0].data || 'https://picsum.photos/600/800'}
                       alt={`${product.name} alternate`}
                       fill
                       className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"

@@ -52,7 +52,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                   />
                   {(Array.isArray(product.images) && product.images.length > 0) && (
                     <Image
-                      src={product.images[0].data}
+                      src={product.images[0].data || 'https://picsum.photos/600/800'}
                       alt={`${product.name} alternate`}
                       fill
                       className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -81,7 +81,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                     </div>
                     {product.images.slice(0, 3).map((img: any, idx: number) => (
                       <div key={idx} className="w-6 h-6 border border-gray-300 relative overflow-hidden cursor-pointer hover:border-black transition-colors opacity-80 hover:opacity-100">
-                         <Image src={img.data} fill alt={`swatch ${idx}`} className="object-cover" />
+                         <Image src={img.data || 'https://picsum.photos/50/50'} fill alt={`swatch ${idx}`} className="object-cover" />
                       </div>
                     ))}
                     {product.images.length > 3 && (
@@ -163,7 +163,7 @@ export default function HomePage() {
              const imgSrc = slide.image?.data || 'https://picsum.photos/1920/1080';
              return (
                <motion.div
-                 key={slide.id}
+                 key={slide.id || index}
                  initial={{ opacity: 0, scale: 1.05 }}
                  animate={{ opacity: 1, scale: 1 }}
                  exit={{ opacity: 0 }}

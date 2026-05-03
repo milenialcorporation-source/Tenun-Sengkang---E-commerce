@@ -178,9 +178,9 @@ export default function Navbar() {
                   {/* Right Column: Featured Cards */}
                   <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {state.megaMenuCards?.slice(0, 4).map((card, idx) => (
-                      <Link key={card.id} href={card.link} className="group" onClick={() => setIsSearchOpen(false)}>
+                      <Link key={card.id || idx} href={card.link || '/shop'} className="group" onClick={() => setIsSearchOpen(false)}>
                         <div className="relative aspect-[16/9] md:aspect-[3/2] overflow-hidden mb-3 bg-gray-100">
-                          <Image src={card.image?.data || `https://picsum.photos/seed/mm${idx}/800/500`} alt={card.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
+                          <Image src={card.image?.data || `https://picsum.photos/seed/mm${idx}/800/500`} alt={card.title || 'Category'} fill className="object-cover group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
                         </div>
                         <h4 className="font-serif text-lg group-hover:text-primary transition-colors">{card.title}</h4>
                       </Link>

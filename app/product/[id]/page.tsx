@@ -34,7 +34,7 @@ export default function ProductPage() {
           <div className="space-y-4">
              <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden">
                <Image 
-                 src={Array.isArray(product.images) && product.images.length > 0 && selectedImageIndex > 0 ? product.images[selectedImageIndex - 1].data : (product.image?.data || 'https://picsum.photos/800/1000')}
+                 src={Array.isArray(product.images) && product.images.length > 0 && selectedImageIndex > 0 ? (product.images[selectedImageIndex - 1].data || 'https://picsum.photos/800/1000') : (product.image?.data || 'https://picsum.photos/800/1000')}
                  alt={product.name}
                  fill
                  className="object-cover"
@@ -49,7 +49,7 @@ export default function ProductPage() {
                  </button>
                  {product.images.map((img: any, idx: number) => (
                    <button key={idx} onClick={() => setSelectedImageIndex(idx + 1)} className={`relative w-20 aspect-[3/4] flex-shrink-0 snap-start border-2 ${selectedImageIndex === idx + 1 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
-                     <Image src={img.data} fill alt={`Variant ${idx + 1}`} className="object-cover" />
+                     <Image src={img.data || 'https://picsum.photos/800/1000'} fill alt={`Variant ${idx + 1}`} className="object-cover" />
                    </button>
                  ))}
                </div>
