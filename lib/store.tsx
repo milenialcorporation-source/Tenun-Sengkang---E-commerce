@@ -37,26 +37,60 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as StoreState;
-        const mergedData = { ...defaultState, ...parsed };
-        setSavedState(mergedData);
-        setLocalState(mergedData);
+    const loadState = async () => {
+      try {
+        // Try fetching from MySQL via our API route
+        const response = await fetch('/api/state');
+        if (response.ok) {
+          const fetchedState = await response.json();
+          if (Object.keys(fetchedState).length > 0) {
+             const mergedData = { ...defaultState, ...fetchedState };
+             setSavedState(mergedData);
+             setLocalState(mergedData);
+             setIsLoaded(true);
+             return;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load from MySQL API:', error);
       }
-    } catch (e) {
-      console.error('Failed to load from local storage', e);
-    }
-    setIsLoaded(true);
+
+      // Fallback to local storage if API fails or is empty
+      try {
+        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored) as StoreState;
+          const mergedData = { ...defaultState, ...parsed };
+          setSavedState(mergedData);
+          setLocalState(mergedData);
+        }
+      } catch (e) {
+        console.error('Failed to load from local storage', e);
+      }
+      setIsLoaded(true);
+    };
+
+    loadState();
   }, []);
 
   const saveToDb = async () => {
     try {
+      // Save locally as a fallback
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
       setSavedState(state);
+
+      // Save to MySQL
+      const res = await fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to save to remote MySQL database", await res.text());
+      }
     } catch (error) {
-      console.error('Error saving config locally:', error);
+      console.error('Error saving config:', error);
       throw error;
     }
   };
