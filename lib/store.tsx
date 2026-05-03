@@ -49,14 +49,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (Object.keys(fetchedState).length > 0) {
              const mergedData = { ...defaultState, ...fetchedState };
              // Ensure arrays are present to avoid crashes
-             mergedData.heroSlides = mergedData.heroSlides || [];
-             mergedData.collections = mergedData.collections || [];
-             mergedData.products = mergedData.products || [];
-             mergedData.featuredSections = mergedData.featuredSections || [];
-             mergedData.megaMenuCards = mergedData.megaMenuCards || [];
-             mergedData.hamburgerProducts = mergedData.hamburgerProducts || [];
-             mergedData.hamburgerCollections = mergedData.hamburgerCollections || [];
-             mergedData.storyImages = mergedData.storyImages || [];
+             mergedData.heroSlides = Array.isArray(mergedData.heroSlides) ? mergedData.heroSlides : [];
+             mergedData.collections = Array.isArray(mergedData.collections) ? mergedData.collections : [];
+             mergedData.products = Array.isArray(mergedData.products) ? mergedData.products : [];
+             mergedData.featuredSections = Array.isArray(mergedData.featuredSections) ? mergedData.featuredSections : [];
+             mergedData.megaMenuCards = Array.isArray(mergedData.megaMenuCards) ? mergedData.megaMenuCards : [];
+             mergedData.hamburgerProducts = Array.isArray(mergedData.hamburgerProducts) ? mergedData.hamburgerProducts : [];
+             mergedData.hamburgerCollections = Array.isArray(mergedData.hamburgerCollections) ? mergedData.hamburgerCollections : [];
+             mergedData.storyImages = Array.isArray(mergedData.storyImages) ? mergedData.storyImages : [];
+             mergedData.profileSlides = Array.isArray(mergedData.profileSlides) ? mergedData.profileSlides : [];
 
              setSavedState(mergedData);
              setLocalState(mergedData);
@@ -74,14 +75,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (stored) {
           const parsed = JSON.parse(stored) as StoreState;
           const mergedData = { ...defaultState, ...parsed };
-             mergedData.heroSlides = mergedData.heroSlides || [];
-             mergedData.collections = mergedData.collections || [];
-             mergedData.products = mergedData.products || [];
-             mergedData.featuredSections = mergedData.featuredSections || [];
-             mergedData.megaMenuCards = mergedData.megaMenuCards || [];
-             mergedData.hamburgerProducts = mergedData.hamburgerProducts || [];
-             mergedData.hamburgerCollections = mergedData.hamburgerCollections || [];
-             mergedData.storyImages = mergedData.storyImages || [];
+             mergedData.heroSlides = Array.isArray(mergedData.heroSlides) ? mergedData.heroSlides : [];
+             mergedData.collections = Array.isArray(mergedData.collections) ? mergedData.collections : [];
+             mergedData.products = Array.isArray(mergedData.products) ? mergedData.products : [];
+             mergedData.featuredSections = Array.isArray(mergedData.featuredSections) ? mergedData.featuredSections : [];
+             mergedData.megaMenuCards = Array.isArray(mergedData.megaMenuCards) ? mergedData.megaMenuCards : [];
+             mergedData.hamburgerProducts = Array.isArray(mergedData.hamburgerProducts) ? mergedData.hamburgerProducts : [];
+             mergedData.hamburgerCollections = Array.isArray(mergedData.hamburgerCollections) ? mergedData.hamburgerCollections : [];
+             mergedData.storyImages = Array.isArray(mergedData.storyImages) ? mergedData.storyImages : [];
+             mergedData.profileSlides = Array.isArray(mergedData.profileSlides) ? mergedData.profileSlides : [];
           setSavedState(mergedData);
           setLocalState(mergedData);
         }
