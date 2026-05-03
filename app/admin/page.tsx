@@ -244,7 +244,7 @@ function HeroManager({ state, setState }: any) {
        </div>
 
        <div className="space-y-6">
-         {state.heroSlides.map((slide: HeroSlide, index: number) => (
+         {(state.heroSlides || []).map((slide: HeroSlide, index: number) => (
            <div key={slide.id} className="border border-gray-200 rounded-md p-6 relative bg-gray-50">
              <button onClick={() => deleteSlide(slide.id)} className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
                <Trash2 size={18} />
@@ -478,7 +478,7 @@ function CollectionManager({ state, setState }: any) {
           <button onClick={addCol} className="bg-primary text-secondary px-4 py-2 rounded font-medium text-sm">Add Collection/Category</button>
        </div>
        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         {state.collections.map((col: Collection) => (
+         {(state.collections || []).map((col: Collection) => (
            <div key={col.id} className="border border-gray-200 rounded p-4 relative">
               <button onClick={() => deleteCol(col.id)} className="absolute top-2 right-2 text-gray-400 hover:text-red-500"><Trash2 size={16}/></button>
               <input type="text" value={col.name} onChange={e => updateCol(col.id, 'name', e.target.value)} className="w-full text-lg font-serif font-semibold border-b border-transparent hover:border-gray-300 focus:border-primary mb-2 focus:outline-none" />
@@ -537,7 +537,7 @@ function ProductManager({ state, setState }: any) {
           <button onClick={addProd} className="bg-primary text-secondary px-4 py-2 rounded font-medium text-sm">Add Product</button>
        </div>
        <div className="space-y-4">
-         {state.products.map((prod: Product) => (
+         {(state.products || []).map((prod: Product) => (
            <div key={prod.id} className="flex flex-col md:flex-row border border-gray-200 rounded p-4 relative gap-6">
                <div className="w-24 h-32 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
                   {prod.image && <img src={prod.image.data} className="w-full h-full object-cover" alt="Preview"/>}
@@ -576,7 +576,7 @@ function ProductManager({ state, setState }: any) {
                     </div>
                     {prod.images && prod.images.length > 0 && (
                       <div className="flex gap-2 flex-wrap mt-2">
-                        {prod.images.map((img, idx) => (
+                        {(prod.images || []).map((img, idx) => (
                            <div key={idx} className="relative w-12 h-12 border border-gray-200 rounded overflow-hidden group">
                               <img src={img.data} className="w-full h-full object-cover" alt={`Variation ${idx+1}`} />
                               <button onClick={() => removeProdImage(prod.id, idx)} className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center">
@@ -680,7 +680,7 @@ function FeaturedSectionManager({ state, setState }: any) {
                     const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
                     updateSection(section.id, 'productIds', selected);
                   }} className="w-full md:w-1/2 border border-gray-300 rounded px-3 py-2 text-sm bg-white min-h-[140px]">
-                    {state.products.map((p: any) => (
+                    {(state.products || []).map((p: any) => (
                       <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
                     ))}
                   </select>
@@ -808,7 +808,7 @@ function HamburgerMenuManager({ state, setState }: any) {
             }} 
             className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm bg-white min-h-[160px]"
           >
-            {state.products.map((p: any) => (
+            {(state.products || []).map((p: any) => (
               <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
             ))}
           </select>
@@ -827,7 +827,7 @@ function HamburgerMenuManager({ state, setState }: any) {
             }} 
             className="w-full md:w-2/3 border border-gray-300 rounded px-3 py-2 text-sm bg-white min-h-[160px]"
           >
-            {state.collections.map((c: any) => (
+            {(state.collections || []).map((c: any) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>

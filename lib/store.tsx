@@ -97,7 +97,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const saveToDb = async () => {
     try {
       // Save locally as a fallback
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Local storage full, proceeding to save to DB only", e);
+      }
       setSavedState(state);
 
       // Save to MySQL
@@ -108,7 +112,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!res.ok) {
-        console.error("Failed to save to remote MySQL database", await res.text());
+        throw new Error(await res.text());
       }
     } catch (error) {
       console.error('Error saving config:', error);
