@@ -143,12 +143,12 @@ export default function HomePage() {
 
   // Auto-advance profile slides
   useEffect(() => {
-    if (!state.profileSlides || state.profileSlides.length <= 1) return;
+    if (!state.storyImages || state.storyImages.length <= 1) return;
     const timer = setInterval(() => {
-      setProfileSlideIndex((prev) => (prev + 1) % state.profileSlides.length);
+      setProfileSlideIndex((prev) => (prev + 1) % state.storyImages.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [state.profileSlides]);
+  }, [state.storyImages]);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (state.heroSlides?.length || 1));
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (state.heroSlides?.length || 1)) % (state.heroSlides?.length || 1));
@@ -259,14 +259,28 @@ export default function HomePage() {
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
              <div className="order-2 lg:order-1 space-y-8">
                <h4 className="text-xs uppercase tracking-widest text-accent font-semibold">Profil Kami</h4>
-               <h2 className="font-serif text-4xl md:text-6xl leading-[1.1] tracking-tight">Warisan<br/>Tenun Sengkang</h2>
+               <h2 className="font-serif text-4xl md:text-6xl leading-[1.1] tracking-tight">
+                 {state.storyTitle ? (
+                   <span dangerouslySetInnerHTML={{ __html: state.storyTitle.replace(/\n/g, '<br/>') }} />
+                 ) : (
+                   <>Warisan<br/>Tenun Sengkang</>
+                 )}
+               </h2>
                <div className="space-y-4 opacity-70 text-base leading-relaxed">
-                 <p>
-                   Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra. Sejak tahun 1990, Kain Sutra Sengkang telah berkomitmen untuk melestarikan tradisi luhur ini melalui keahlian dan dedikasi.
-                 </p>
-                 <p>
-                   Kami bekerja berdampingan dengan para pengrajin lokal, memastikan setiap helai benang ditenun dengan presisi dan cinta, menghasilkan karya seni yang tak lekang oleh waktu dan menghargai nilai sejarah. Misi kami adalah menghadirkan kemewahan sutra Sengkang ke seluruh penjuru negeri, menggabungkan desain klasik dengan sentuhan modern.
-                 </p>
+                 {state.storyDescription ? (
+                   state.storyDescription.split('\n').map((paragraph: string, i: number) => (
+                     <p key={i}>{paragraph}</p>
+                   ))
+                 ) : (
+                   <>
+                     <p>
+                       Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra. Sejak tahun 1990, Kain Sutra Sengkang telah berkomitmen untuk melestarikan tradisi luhur ini melalui keahlian dan dedikasi.
+                     </p>
+                     <p>
+                       Kami bekerja berdampingan dengan para pengrajin lokal, memastikan setiap helai benang ditenun dengan presisi dan cinta, menghasilkan karya seni yang tak lekang oleh waktu dan menghargai nilai sejarah. Misi kami adalah menghadirkan kemewahan sutra Sengkang ke seluruh penjuru negeri, menggabungkan desain klasik dengan sentuhan modern.
+                     </p>
+                   </>
+                 )}
                </div>
                <div className="pt-8 block">
                   <Link href="/profile" className="inline-flex items-center gap-2 group">
@@ -286,7 +300,7 @@ export default function HomePage() {
                  className="relative h-full w-full aspect-[4/5] z-10 overflow-hidden rounded-sm"
                 >
                   <AnimatePresence initial={false}>
-                    {state.profileSlides && state.profileSlides.length > 0 ? (
+                    {state.storyImages && state.storyImages.length > 0 ? (
                       <motion.div
                          key={profileSlideIndex}
                          initial={{ opacity: 0, scale: 1.05 }}
@@ -296,7 +310,7 @@ export default function HomePage() {
                          className="absolute inset-0"
                       >
                        <Image 
-                         src={state.profileSlides[profileSlideIndex]?.data || 'https://picsum.photos/seed/brandprofile/800/1000'} 
+                         src={state.storyImages[profileSlideIndex % state.storyImages.length]?.image?.data || 'https://picsum.photos/seed/brandprofile/800/1000'} 
                          fill 
                          className="object-cover" 
                          alt="Pengrajin Tenun Sengkang" 

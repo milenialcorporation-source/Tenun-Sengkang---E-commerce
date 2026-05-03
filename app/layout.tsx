@@ -19,6 +19,22 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: 'Kain Sutra Sengkang | Luxury Silk',
   description: 'Keindahan Kain Sutra Asli dari Sengkang',
+  openGraph: {
+    title: 'Kain Sutra Sengkang | Luxury Silk',
+    description: 'Keindahan Kain Sutra Asli dari Sengkang',
+    url: 'https://khaki-dunlin-111283.hostingersite.com',
+    siteName: 'Kain Sutra Sengkang',
+    images: [
+      {
+        url: 'https://picsum.photos/1200/630', // We can use a reliable placeholder or the app's actual representative image
+        width: 1200,
+        height: 630,
+        alt: 'Kain Sutra Sengkang',
+      },
+    ],
+    locale: 'id_ID',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

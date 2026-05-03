@@ -25,10 +25,20 @@ export default function ProfilePage() {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 lg:p-24 bg-[#fcfbf9]">
           <div className="max-w-xl w-full">
             <h1 className="font-serif text-5xl md:text-6xl text-gray-900 mb-8 leading-[1.1]">
-              {state.storyTitle || 'Warisan\nTenun Sengkang'}
+              {state.storyTitle ? (
+                <span dangerouslySetInnerHTML={{ __html: state.storyTitle.replace(/\n/g, '<br/>') }} />
+              ) : (
+                <>Warisan<br/>Tenun Sengkang</>
+              )}
             </h1>
             <div className="text-gray-700 text-sm md:text-base leading-relaxed space-y-6">
-              {state.storyDescription || 'Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra...'}
+              {state.storyDescription ? (
+                 state.storyDescription.split('\n').map((paragraph: string, i: number) => (
+                   <p key={i}>{paragraph}</p>
+                 ))
+               ) : (
+                 <p>Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra...</p>
+               )}
             </div>
           </div>
         </div>
