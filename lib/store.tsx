@@ -40,7 +40,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const loadState = async () => {
       try {
         // Try fetching from MySQL via our API route
-        const response = await fetch('/api/state');
+        const response = await fetch('/api/state', { cache: 'no-store' });
         if (response.ok) {
           const fetchedState = await response.json();
           if (Object.keys(fetchedState).length > 0) {
