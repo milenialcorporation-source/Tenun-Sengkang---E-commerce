@@ -14,13 +14,15 @@ function ShopContent() {
 
   // Derive categories from products + collections
   const categories = useMemo(() => {
-    const cats = new Set(state.products.map(p => p.category));
-    state.collections.forEach(c => cats.add(c.name));
+    const ObjectProducts = state.products || [];
+    const ObjectCollections = state.collections || [];
+    const cats = new Set(ObjectProducts.map(p => p.category));
+    ObjectCollections.forEach(c => cats.add(c.name));
     return Array.from(cats);
   }, [state.products, state.collections]);
 
   const filteredProducts = useMemo(() => {
-    let p = state.products;
+    let p = state.products || [];
     if (selectedCategory) {
       p = p.filter(prod => prod.category === selectedCategory);
     }

@@ -11,7 +11,7 @@ export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
   const { state } = useStore();
-  const product = state.products.find(p => p.id === id);
+  const product = (state.products || []).find(p => p.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
   if (!product) {

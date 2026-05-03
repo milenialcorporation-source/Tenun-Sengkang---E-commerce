@@ -56,7 +56,7 @@ export default function ProfilePage() {
       {/* Masonry/Grid of Images */}
       <div className="px-4 md:px-8 pb-32 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-x-6 md:gap-y-12">
-          {state.storyImages?.map((item) => (
+          {(state.storyImages || []).map((item) => (
             <div 
               key={item.id} 
               className="group relative flex flex-col cursor-pointer"

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
-function FeaturedSectionView({ section, products, collections }: { section: any, products: any[], collections: any[] }) {
+function FeaturedSectionView({ section, products = [], collections = [] }: { section: any, products: any[], collections: any[] }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   let displayedProducts = [];
@@ -134,12 +134,12 @@ export default function HomePage() {
 
   // Auto-advance hero slides
   useEffect(() => {
-    if (state.heroSlides.length <= 1) return;
+    if (!state.heroSlides || state.heroSlides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % state.heroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [state.heroSlides.length]);
+  }, [state.heroSlides]);
 
   // Auto-advance profile slides
   useEffect(() => {
@@ -150,15 +150,15 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, [state.profileSlides]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % state.heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + state.heroSlides.length) % state.heroSlides.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (state.heroSlides?.length || 1));
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (state.heroSlides?.length || 1)) % (state.heroSlides?.length || 1));
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Carousel */}
       <section className="relative w-full aspect-[16/10] sm:aspect-[2/1] md:aspect-[2.5/1] lg:aspect-[3.2/1] bg-black overflow-hidden group">
         <AnimatePresence initial={false}>
-          {state.heroSlides.map((slide, index) => {
+          {(state.heroSlides || []).map((slide, index) => {
              if (index !== currentSlide) return null;
              const imgSrc = slide.image?.data || 'https://picsum.photos/1920/1080';
              return (
@@ -226,7 +226,7 @@ export default function HomePage() {
         </AnimatePresence>
 
         {/* Controls */}
-        {state.heroSlides.length > 1 && (
+        {(state.heroSlides?.length || 0) > 1 && (
           <>
             <button onClick={prevSlide} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-2 z-10 hidden md:block">
               <ChevronLeft size={40} strokeWidth={1} />
@@ -235,7 +235,7 @@ export default function HomePage() {
               <ChevronRight size={40} strokeWidth={1} />
             </button>
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10 justify-center items-center">
-              {state.heroSlides.map((_, i) => (
+              {(state.heroSlides || []).map((_, i) => (
                 <button 
                   key={i} 
                   onClick={() => setCurrentSlide(i)}
@@ -249,7 +249,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Sections */}
-      {state.featuredSections?.map(section => (
+      {(state.featuredSections || []).map(section => (
         <FeaturedSectionView key={section.id} section={section} products={state.products} collections={state.collections} />
       ))}
 
