@@ -47,6 +47,13 @@ export type MegaMenuCard = {
   link: string;
 };
 
+export type StoryImage = {
+  id: string;
+  image?: ImageInput;
+  title: string;
+  caption: string;
+};
+
 export type StoreState = {
   logo?: ImageInput;
   heroSlides: HeroSlide[];
@@ -58,4 +65,7 @@ export type StoreState = {
   megaMenuCards: MegaMenuCard[];
   hamburgerProducts: string[];
   hamburgerCollections: string[];
+  storyTitle: string;
+  storyDescription: string;
+  storyImages: StoryImage[];
 };

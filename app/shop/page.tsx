@@ -29,10 +29,10 @@ function ShopContent() {
   }, [state.products, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Shop Header */}
-      <div className="bg-gray-50 py-16 px-4 mb-16 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto text-center">
+      <div className="bg-gradient-to-b from-[#fdfbf7] to-white py-16 px-4 mb-16 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto text-center mt-8">
            <h1 className="font-serif text-5xl md:text-6xl mb-4">Koleksi Lengkap</h1>
            <p className="text-secondary opacity-60 max-w-xl mx-auto text-sm leading-relaxed">
              Temukan berbagai macam motif dan warna kain sutra Sengkang asli. Setiap potong adalah hasil karya seni yang bernilai tinggi.

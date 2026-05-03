@@ -269,7 +269,7 @@ export default function HomePage() {
                  </p>
                </div>
                <div className="pt-8 block">
-                  <Link href="/about" className="inline-flex items-center gap-2 group">
+                  <Link href="/profile" className="inline-flex items-center gap-2 group">
                     <span className="uppercase text-sm font-semibold tracking-widest border-b border-black group-hover:border-primary group-hover:text-primary transition-colors">Pelajari Lebih Lanjut</span>
                     <ChevronRight className="w-4 h-4 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </Link>

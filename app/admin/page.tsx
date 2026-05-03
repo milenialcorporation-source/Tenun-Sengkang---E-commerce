@@ -5,8 +5,6 @@ import { useStore } from '@/lib/store';
 import { ImageInput, HeroSlide, Collection, Product } from '@/lib/types';
 import Image from 'next/image';
 import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw } from 'lucide-react';
-import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 const handleImageUpload = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -22,46 +20,16 @@ type Tab = 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' |
 export default function AdminDashboard() {
   const { state, savedState, setState, saveToDb, discardChanges } = useStore();
   const [activeTab, setActiveTab] = useState<Tab>('logo');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [pinEntry, setPinEntry] = useState('');
+  const [isPinCorrect, setIsPinCorrect] = useState(false);
 
   const hasChanges = JSON.stringify(state) !== JSON.stringify(savedState);
 
-  // Check auth state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && user.email === 'azkarmsd@gmail.com') {
-        setIsAuthenticated(true);
-      } else {
-        if (user) signOut(auth);
-        setIsAuthenticated(false);
-      }
-      setIsAuthChecking(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setError('');
-    try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(auth, provider);
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
-      console.error(err);
-    }
-  };
-
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (err) {
-      console.error('Error signing out', err);
-    }
+    setIsPinCorrect(false);
+    setPinEntry('');
   };
 
   const handleSave = async () => {
@@ -76,27 +44,30 @@ export default function AdminDashboard() {
     }
   };
 
-  if (isAuthChecking) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p>Checking admin status...</p></div>;
-  }
-
-  if (!isAuthenticated) {
+  if (!isPinCorrect) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 w-full max-w-sm">
-          <h1 className="font-serif text-2xl text-center mb-2">Admin Access</h1>
-          <p className="text-xs text-gray-500 text-center mb-6 uppercase tracking-widest">Restricted Area</p>
-          
-          <div className="space-y-4">
-            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+          <h1 className="font-serif text-2xl text-center mb-6">Restricted Area</h1>
+          <form onSubmit={(e) => { 
+            e.preventDefault(); 
+            if (pinEntry === 'admin123') setIsPinCorrect(true); 
+            else { alert('Invalid PIN'); setPinEntry(''); }
+          }}>
+            <input 
+              type="password" 
+              placeholder="Enter Access PIN" 
+              value={pinEntry}
+              onChange={e => setPinEntry(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-4 text-center tracking-widest text-lg"
+            />
             <button 
-              onClick={handleLogin}
-              className="w-full bg-black text-white py-3 text-sm font-semibold uppercase tracking-widest hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+              type="submit"
+              className="w-full bg-black text-white py-3 text-sm font-semibold uppercase tracking-widest hover:bg-gray-800 transition-colors"
             >
-              Sign In with Google
+              Continue
             </button>
-            <p className="text-xs text-gray-400 text-center mt-2">Only authorized administrators may log in.</p>
-          </div>
+          </form>
         </div>
       </div>
     );
@@ -116,7 +87,7 @@ export default function AdminDashboard() {
           <TabButton active={activeTab === 'featuredSections'} onClick={() => setActiveTab('featuredSections')} icon={<Layout size={18} />} label="Featured Sections" />
           <TabButton active={activeTab === 'megaMenu'} onClick={() => setActiveTab('megaMenu')} icon={<Layout size={18} />} label="Mega Menu Cards" />
           <TabButton active={activeTab === 'hamburgerMenu'} onClick={() => setActiveTab('hamburgerMenu')} icon={<Layout size={18} />} label="Hamburger Menu" />
-          <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<ImageIcon size={18} />} label="Profile Slides" />
+          <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<ImageIcon size={18} />} label="About Page Settings" />
           <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={<FolderPlus size={18} />} label="Collections/Category" />
           <TabButton active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Box size={18} />} label="Products" />
           <TabButton active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} icon={<ToggleLeft size={18} />} label="Catalog Control" />
@@ -150,7 +121,7 @@ export default function AdminDashboard() {
           {activeTab === 'featuredSections' && <FeaturedSectionManager state={state} setState={setState} />}
           {activeTab === 'megaMenu' && <MegaMenuManager state={state} setState={setState} />}
           {activeTab === 'hamburgerMenu' && <HamburgerMenuManager state={state} setState={setState} />}
-          {activeTab === 'profile' && <ProfileSlideManager state={state} setState={setState} />}
+          {activeTab === 'profile' && <AboutPageManager state={state} setState={setState} />}
           {activeTab === 'collections' && <CollectionManager state={state} setState={setState} />}
           {activeTab === 'products' && <ProductManager state={state} setState={setState} />}
           {activeTab === 'catalog' && <CatalogManager state={state} setState={setState} />}
@@ -339,62 +310,134 @@ function HeroManager({ state, setState }: any) {
    );
 }
 
-function ProfileSlideManager({ state, setState }: any) {
-  const slides = state.profileSlides || [];
+function AboutPageManager({ state, setState }: any) {
+  const images = state.storyImages || [];
 
-  const addSlide = () => {
-    setState((s: any) => ({ ...s, profileSlides: [...slides, { type: 'url', data: 'https://picsum.photos/seed/brandprofile/800/1000' }] }));
+  const addImage = () => {
+    if (images.length >= 20) return;
+    setState((s: any) => ({ 
+      ...s, 
+      storyImages: [...images, { id: Math.random().toString(), title: '', caption: '', image: { type: 'url', data: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' } }] 
+    }));
   };
 
-  const updateSlideImage = async (index: number, type: 'url' | 'base64', data: string | File) => {
+  const updateImage = async (id: string, type: 'url' | 'base64', data: string | File) => {
     let imageData = data as string;
     if (type === 'base64') {
       imageData = await handleImageUpload(data as File);
     }
-    const newSlides = [...slides];
-    newSlides[index] = { type, data: imageData };
-    setState((s: any) => ({ ...s, profileSlides: newSlides }));
+    setState((s: any) => ({
+      ...s,
+      storyImages: s.storyImages.map((img: any) => img.id === id ? { ...img, image: { type, data: imageData } } : img)
+    }));
   };
 
-  const deleteSlide = (index: number) => {
-    setState((s: any) => ({ ...s, profileSlides: slides.filter((_: any, i: number) => i !== index) }));
+  const updateTitle = (id: string, title: string) => {
+    setState((s: any) => ({
+      ...s,
+      storyImages: s.storyImages.map((img: any) => img.id === id ? { ...img, title } : img)
+    }));
+  };
+
+  const updateCaption = (id: string, caption: string) => {
+    setState((s: any) => ({
+      ...s,
+      storyImages: s.storyImages.map((img: any) => img.id === id ? { ...img, caption } : img)
+    }));
+  };
+
+  const deleteImage = (id: string) => {
+    setState((s: any) => ({ 
+      ...s, 
+      storyImages: s.storyImages.filter((img: any) => img.id !== id) 
+    }));
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="grid grid-cols-1 gap-6 p-6 border border-gray-200 rounded-md bg-gray-50">
          <div>
-           <h3 className="text-lg font-semibold">Profile Slides</h3>
-           <p className="text-sm text-gray-500">Manage the automated slideshow for the Brand Profile section.</p>
-           <p className="text-xs text-primary font-medium mt-1">Recommended ratio: 4:5 portrait (e.g., 800x1000px).</p>
+           <h3 className="text-lg font-semibold mb-1">About Page Text</h3>
+           <p className="text-sm text-gray-500 mb-4">Edit the title and content for the profile page.</p>
          </div>
-         <button onClick={addSlide} className="flex items-center gap-2 bg-primary text-secondary px-4 py-2 rounded-md font-medium text-sm hover:brightness-105">
-           <Plus size={16} /> Add Slide
+         <div className="space-y-4">
+           <div>
+             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Title</label>
+             <input 
+               type="text" 
+               value={state.storyTitle || ''} 
+               onChange={e => setState((s: any) => ({ ...s, storyTitle: e.target.value }))}
+               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
+             />
+           </div>
+           <div>
+             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Description (Story)</label>
+             <textarea 
+               rows={6}
+               value={state.storyDescription || ''} 
+               onChange={e => setState((s: any) => ({ ...s, storyDescription: e.target.value }))}
+               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
+             />
+           </div>
+         </div>
+      </div>
+
+      <div className="flex justify-between items-center mb-6 pt-4 border-t border-gray-200">
+         <div>
+           <h3 className="text-lg font-semibold">Story Timeline Images ({images.length}/20)</h3>
+           <p className="text-sm text-gray-500">Manage the collection of images shown on the profile page.</p>
+           <p className="text-xs text-primary font-medium mt-1">Recommended ratio: 3:4 portrait.</p>
+         </div>
+         <button onClick={addImage} disabled={images.length >= 20} className="flex items-center gap-2 bg-primary text-secondary px-4 py-2 rounded-md font-medium text-sm hover:brightness-105 disabled:opacity-50">
+           <Plus size={16} /> Add Image
          </button>
       </div>
 
-      <div className="space-y-6">
-        {slides.map((slide: ImageInput, index: number) => (
-          <div key={index} className="border border-gray-200 rounded-md p-6 relative bg-gray-50 flex flex-col md:flex-row gap-6 items-start">
-            <button onClick={() => deleteSlide(index)} className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
-              <Trash2 size={18} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {images.map((img: any, index: number) => (
+          <div key={img.id} className="border border-gray-200 rounded-md p-6 relative bg-white flex flex-col gap-4 shadow-sm">
+            <button onClick={() => deleteImage(img.id)} className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
+              <Trash2 size={16} />
             </button>
             
-            <div className="flex-1 w-full space-y-4">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Slide Image {index + 1}</label>
-              <div className="flex gap-4">
-                <div className="relative">
-                  <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) updateSlideImage(index, 'base64', e.target.files[0]) }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                  <button className="px-4 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50">Upload File</button>
-                </div>
-                <div className="flex-1 flex gap-2">
-                  <input type="text" placeholder="Or enter image URL..." onBlur={e => e.target.value && updateSlideImage(index, 'url', e.target.value)} className="flex-1 border border-gray-300 px-3 py-2 text-sm rounded focus:outline-none focus:border-black" />
-                </div>
-              </div>
+            <div className="w-full aspect-[3/4] bg-gray-100 rounded overflow-hidden border border-gray-200 relative">
+               {img.image?.data ? (
+                 <img src={img.image.data} className="w-full h-full object-cover" alt={`Story ${index + 1}`} />
+               ) : (
+                 <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+               )}
             </div>
 
-            <div className="w-full md:w-32 aspect-[4/5] bg-gray-200 rounded overflow-hidden border border-gray-300 mt-4 md:mt-0 flex-shrink-0">
-               <img src={slide.data} className="w-full h-full object-cover" alt={`Slide preview ${index + 1}`} />
+            <div className="w-full space-y-4">
+              <div className="flex flex-col gap-2">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest">Image Source</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) updateImage(img.id, 'base64', e.target.files[0]) }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <button className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded text-xs hover:bg-gray-100 text-center">Upload File</button>
+                  </div>
+                  <input type="text" placeholder="Or URL..." value={img.image?.type === 'url' ? img.image.data : ''} onChange={e => updateImage(img.id, 'url', e.target.value)} className="flex-1 border border-gray-300 px-3 py-1 text-xs rounded focus:outline-none focus:border-black" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Title</label>
+                <input
+                  type="text"
+                  placeholder="Momen Ini..."
+                  value={img.title || ''} 
+                  onChange={e => updateTitle(img.id, e.target.value)}
+                  className="w-full border border-gray-300 px-3 py-2 mb-3 text-sm rounded focus:outline-none focus:border-black" 
+                />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Caption</label>
+                <textarea
+                  rows={2}
+                  placeholder="Tell a story about this moment..."
+                  value={img.caption || ''} 
+                  onChange={e => updateCaption(img.id, e.target.value)}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm rounded focus:outline-none focus:border-black resize-none" 
+                />
+              </div>
             </div>
           </div>
         ))}

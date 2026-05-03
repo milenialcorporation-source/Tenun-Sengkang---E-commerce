@@ -2,8 +2,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { StoreState, HeroSlide, Collection, Product, ImageInput } from './types';
-import { db } from './firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 const defaultState: StoreState = {
   heroSlides: [],
@@ -15,6 +13,9 @@ const defaultState: StoreState = {
   megaMenuCards: [],
   hamburgerProducts: [],
   hamburgerCollections: [],
+  storyTitle: 'Profil Kami',
+  storyDescription: 'Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra. Sejak tahun 1990, Kain Sutra Sengkang telah berkomitmen untuk melestarikan tradisi luhur ini melalui keahlian dan dedikasi.\n\nKami bekerja berdampingan dengan para pengrajin lokal, memastikan setiap helai benang ditenun dengan presisi dan cinta, menghasilkan karya seni yang tak lekang oleh waktu dan menghargai nilai sejarah. Misi kami adalah menghadirkan kemewahan sutra Sengkang ke seluruh penjuru negeri, menggabungkan desain klasik dengan sentuhan modern.',
+  storyImages: [],
 };
 
 type StoreContextType = {
@@ -28,7 +29,7 @@ type StoreContextType = {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const CONFIG_DOC_ID = 'main';
+const LOCAL_STORAGE_KEY = 'kainsutra_state_v1';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, setLocalState] = useState<StoreState>(defaultState);
@@ -36,38 +37,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const docRef = doc(db, 'config', CONFIG_DOC_ID);
-    
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as StoreState;
-        const mergedData = { ...defaultState, ...data };
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as StoreState;
+        const mergedData = { ...defaultState, ...parsed };
         setSavedState(mergedData);
-        setLocalState(mergedData); // Sync local state when remote updates
-      } else {
-        // Initialize if it doesn't exist
-        setDoc(docRef, defaultState).catch((err) => {
-          // Ignore permission-denied errors on initialization (expected for non-admins)
-          if (err.code !== 'permission-denied') {
-            console.error('Failed to initialize config:', err);
-          }
-        });
+        setLocalState(mergedData);
       }
-      setIsLoaded(true);
-    }, (error) => {
-      console.error('Error listening to config:', error);
-      // Fallback to local state if offline/error
-      setIsLoaded(true);
-    });
-
-    return () => unsubscribe();
+    } catch (e) {
+      console.error('Failed to load from local storage', e);
+    }
+    setIsLoaded(true);
   }, []);
 
   const saveToDb = async () => {
     try {
-      await setDoc(doc(db, 'config', CONFIG_DOC_ID), state, { merge: true });
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+      setSavedState(state);
     } catch (error) {
-      console.error('Error saving config:', error);
+      console.error('Error saving config locally:', error);
       throw error;
     }
   };
@@ -79,7 +68,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const setState: React.Dispatch<React.SetStateAction<StoreState>> = (value) => {
     setLocalState((prevState) => {
       const newState = typeof value === 'function' ? value(prevState) : value;
-      // Removed auto save
       return newState;
     });
   };

@@ -48,74 +48,89 @@ export default function Navbar() {
 
   return (
     <>
-      <nav ref={searchRef} className="sticky top-0 z-50 bg-white border-b border-primary/10">
+      <nav ref={searchRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="px-4 md:px-8 bg-transparent relative z-50">
-          <div className="flex justify-between items-center h-20">
-            {/* Left section: Hamburger & Search */}
-            <div className="flex items-center space-x-4 md:space-x-6 flex-1">
-              <button 
-                onClick={() => {
-                  setIsMenuOpen(true);
-                  setIsSearchOpen(false);
-                }} 
-                className="hover:opacity-70 transition-opacity"
-              >
-                <Menu className="w-6 h-6 text-black" strokeWidth={1.5} />
-              </button>
-              <div className="flex items-center relative">
-                <button 
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className="hover:opacity-70 transition-opacity flex items-center"
-                >
-                  <Search className="w-5 h-5 text-black" strokeWidth={1.5} />
-                </button>
-                {/* Collapsible Search Input Space */}
-                <div 
-                  className={`flex items-center overflow-hidden transition-all duration-500 ease-in-out border-b border-black ${isSearchOpen ? 'w-48 md:w-64 opacity-100 ml-2 pb-1' : 'w-0 opacity-0 ml-0 border-transparent'}`}
-                >
-                  <input 
+            {/* Mobile Search Overlay */}
+            {isSearchOpen && (
+              <div className="absolute inset-0 bg-white flex items-center px-4 md:hidden z-20">
+                 <button onClick={() => setIsSearchOpen(false)} className="mr-4">
+                    <Search className="w-5 h-5 text-black" />
+                 </button>
+                 <input 
                     type="text" 
                     placeholder="SEARCH" 
-                    className="outline-none text-xs w-full uppercase tracking-widest bg-transparent placeholder:text-gray-400"
-                    autoFocus={isSearchOpen}
+                    className="outline-none text-sm w-full uppercase tracking-widest bg-transparent outline-none ring-0 border-none placeholder:text-gray-400"
+                    autoFocus
                   />
-                  {isSearchOpen && (
-                    <button className="text-gray-600 hover:text-black transition-colors">
-                      <Camera className="w-4 h-4" strokeWidth={1.5} />
-                    </button>
-                  )}
+                 <button onClick={() => setIsSearchOpen(false)} className="ml-4">
+                    <X className="w-5 h-5 text-black" />
+                 </button>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center h-20">
+              {/* Left section: Hamburger & Search */}
+              <div className="flex items-center space-x-4 md:space-x-6 flex-1">
+                <button 
+                  onClick={() => {
+                    setIsMenuOpen(true);
+                    setIsSearchOpen(false);
+                  }} 
+                  className="hover:opacity-70 transition-opacity"
+                >
+                  <Menu className="w-6 h-6 text-black" strokeWidth={1.5} />
+                </button>
+                <div className="flex items-center relative">
+                  <button 
+                    onClick={() => setIsSearchOpen(!isSearchOpen)}
+                    className="hover:opacity-70 transition-opacity flex items-center"
+                  >
+                    <Search className="w-5 h-5 text-black" strokeWidth={1.5} />
+                  </button>
+                  {/* Collapsible Search Input Space (Desktop) */}
+                  <div 
+                    className={`hidden md:flex items-center overflow-hidden transition-all duration-500 ease-in-out border-b border-black ${isSearchOpen ? 'w-48 md:w-64 opacity-100 ml-2 pb-1' : 'w-0 opacity-0 ml-0 border-transparent'}`}
+                  >
+                    <input 
+                      type="text" 
+                      placeholder="SEARCH" 
+                      className="outline-none text-xs w-full uppercase tracking-widest bg-transparent placeholder:text-gray-400"
+                      autoFocus={isSearchOpen}
+                    />
+                    {isSearchOpen && (
+                      <button className="text-gray-600 hover:text-black transition-colors">
+                        <Camera className="w-4 h-4" strokeWidth={1.5} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Center section: Logo */}
-            <div className="flex-shrink-0 flex flex-col items-center justify-center flex-1">
-              <Link href="/" className="flex flex-col items-center">
-                {logoSrc ? (
-                  <div className="relative h-14 w-48 md:h-16 md:w-64 mb-1">
-                    <Image src={logoSrc} alt="Kain Sutra Sengkang" fill className="object-contain" referrerPolicy="no-referrer" />
-                  </div>
-                ) : (
-                  <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.15em] text-[#1a1a1a]">
-                    KAIN<span className="text-primary">.</span>SUTRA
-                  </span>
-                )}
-              </Link>
-            </div>
+              {/* Center section: Logo */}
+              <div className="flex-shrink-0 flex flex-col items-center justify-center flex-1">
+                <Link href="/" className="flex flex-col items-center">
+                  {logoSrc ? (
+                    <div className="relative h-14 w-48 md:h-16 md:w-64 mb-1">
+                      <Image src={logoSrc} alt="Website Logo" fill className="object-contain" referrerPolicy="no-referrer" />
+                    </div>
+                  ) : (
+                    <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.15em] text-[#1a1a1a]">
+                      KAIN<span className="text-primary">.</span>SUTRA
+                    </span>
+                  )}
+                </Link>
+              </div>
 
-            {/* Right section: Icons */}
-            <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
-              <Link href="/shop" className="hover:opacity-70 transition-opacity hidden md:block">
-                <Heart className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
-              </Link>
-              <Link href="/login" className="hover:opacity-70 transition-opacity">
-                <User className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
-              </Link>
-              <Link href="/cart" className="hover:opacity-70 transition-opacity">
-                <ShoppingBag className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
-              </Link>
+              {/* Right section: Icons */}
+              <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
+                <Link href="/login" className="hover:opacity-70 transition-opacity">
+                  <User className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
+                </Link>
+                <Link href="/cart" className="hover:opacity-70 transition-opacity">
+                  <ShoppingBag className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
+                </Link>
+              </div>
             </div>
-          </div>
         </div>
 
         {/* Mega Menu / Search Panel */}
@@ -280,7 +295,7 @@ export default function Navbar() {
                   </li>
                   <li className="pt-6 border-t border-gray-100 mt-6">
                     <Link href="/profile" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      Our Story
+                      Cerita Kami
                     </Link>
                   </li>
                 </ul>
