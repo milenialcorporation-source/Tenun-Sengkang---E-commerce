@@ -15,7 +15,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
     const categoryName = collections.find(c => c.id === section.categoryId)?.name;
     displayedProducts = products.filter(p => p.category === categoryName);
   } else if (section.type === 'products' && section.productIds) {
-    displayedProducts = products.filter(p => section.productIds!.includes(p.id));
+    displayedProducts = products.filter(p => (section.productIds || []).includes(p.id));
   }
 
   if (displayedProducts.length === 0) return null;
@@ -47,10 +47,10 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
                     alt={product.name} 
                     fill 
-                    className={`object-cover transition-opacity duration-500 ${(product.images && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:opacity-90'}`}
+                    className={`object-cover transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:opacity-90'}`}
                     referrerPolicy="no-referrer"
                   />
-                  {(product.images && product.images.length > 0) && (
+                  {(Array.isArray(product.images) && product.images.length > 0) && (
                     <Image
                       src={product.images[0].data}
                       alt={`${product.name} alternate`}
@@ -74,7 +74,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                 </Link>
 
                 {/* Color Swatches */}
-                {(product.images && product.images.length > 0) && (
+                {(Array.isArray(product.images) && product.images.length > 0) && (
                   <div className="flex items-center gap-1.5 mb-3 flex-wrap">
                     <div className="w-6 h-6 border border-black relative overflow-hidden cursor-pointer transition-colors">
                        <Image src={product.image?.data || 'https://picsum.photos/50/50'} fill alt="Main" className="object-cover" />
@@ -97,7 +97,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                     <p className="text-gray-400 text-xs tracking-wide">{product.category} Embellished</p>
                   </Link>
                   <span className="font-medium tracking-wide whitespace-nowrap ml-4">
-                    {product.price.toLocaleString('id-ID')} IDR
+                    {Number(product.price || 0).toLocaleString('id-ID')} IDR
                   </span>
                 </div>
               </div>

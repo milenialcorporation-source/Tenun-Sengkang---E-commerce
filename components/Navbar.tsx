@@ -43,8 +43,8 @@ export default function Navbar() {
 
   const logoSrc = getLogo();
 
-  const hProducts = (state.products || []).filter(p => state.hamburgerProducts?.includes(p.id));
-  const hCollections = (state.collections || []).filter(c => state.hamburgerCollections?.includes(c.id));
+  const hProducts = (state.products || []).filter(p => (state.hamburgerProducts || []).includes(p.id));
+  const hCollections = (state.collections || []).filter(c => (state.hamburgerCollections || []).includes(c.id));
 
   return (
     <>

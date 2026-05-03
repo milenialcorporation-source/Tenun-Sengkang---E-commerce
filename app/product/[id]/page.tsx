@@ -34,7 +34,7 @@ export default function ProductPage() {
           <div className="space-y-4">
              <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden">
                <Image 
-                 src={product.images && product.images.length > 0 && selectedImageIndex > 0 ? product.images[selectedImageIndex - 1].data : (product.image?.data || 'https://picsum.photos/800/1000')}
+                 src={Array.isArray(product.images) && product.images.length > 0 && selectedImageIndex > 0 ? product.images[selectedImageIndex - 1].data : (product.image?.data || 'https://picsum.photos/800/1000')}
                  alt={product.name}
                  fill
                  className="object-cover"
@@ -42,12 +42,12 @@ export default function ProductPage() {
                  priority
                />
              </div>
-             {(product.images && product.images.length > 0) && (
+             {(Array.isArray(product.images) && product.images.length > 0) && (
                <div className="flex gap-4 overflow-x-auto pb-2 snap-x">
                  <button onClick={() => setSelectedImageIndex(0)} className={`relative w-20 aspect-[3/4] flex-shrink-0 snap-start border-2 ${selectedImageIndex === 0 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
                    <Image src={product.image?.data || 'https://picsum.photos/800/1000'} fill alt="Main" className="object-cover" />
                  </button>
-                 {product.images.map((img, idx) => (
+                 {product.images.map((img: any, idx: number) => (
                    <button key={idx} onClick={() => setSelectedImageIndex(idx + 1)} className={`relative w-20 aspect-[3/4] flex-shrink-0 snap-start border-2 ${selectedImageIndex === idx + 1 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
                      <Image src={img.data} fill alt={`Variant ${idx + 1}`} className="object-cover" />
                    </button>
@@ -62,7 +62,7 @@ export default function ProductPage() {
                {product.category}
              </Link>
              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl mb-6">{product.name}</h1>
-             <p className="text-2xl opacity-80 mb-10">Rp {product.price.toLocaleString('id-ID')}</p>
+             <p className="text-2xl opacity-80 mb-10">Rp {Number(product.price || 0).toLocaleString('id-ID')}</p>
              
              <div className="prose prose-sm opacity-70 mb-12">
                <p>{product.description}</p>

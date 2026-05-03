@@ -91,10 +91,10 @@ function ShopContent() {
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
                     alt={product.name} 
                     fill 
-                    className={`object-cover transition-opacity duration-500 ${(product.images && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+                    className={`object-cover transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                     referrerPolicy="no-referrer"
                   />
-                  {(product.images && product.images.length > 0) && (
+                  {(Array.isArray(product.images) && product.images.length > 0) && (
                     <Image
                       src={product.images[0].data}
                       alt={`${product.name} alternate`}
@@ -109,7 +109,7 @@ function ShopContent() {
                   <h3 className="font-serif text-lg mb-1">{product.name}</h3>
                   <div className="flex justify-between items-center text-sm">
                     <span className="opacity-60">{product.category}</span>
-                    <span className="font-semibold text-accent">Rp {product.price.toLocaleString('id-ID')}</span>
+                    <span className="font-semibold text-accent">Rp {Number(product.price || 0).toLocaleString('id-ID')}</span>
                   </div>
                 </div>
               </Link>
