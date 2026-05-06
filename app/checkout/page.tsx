@@ -1,11 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useStore } from '@/lib/store';
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [step, setStep] = useState<1 | 2>(1);
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('productId');
+  const { state } = useStore();
 
+  const product = (state.products || []).find(p => p.id === productId);
+
+  // Fallback to a default if no product is selected (for direct visits)
+  const itemName = product ? `${product.name} (1x)` : 'Produk (1x)';
+  const itemPrice = product ? Number(product.price || 0) : 1500000;
+  
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-24">
       <div className="max-w-4xl mx-auto px-4">
@@ -89,8 +100,8 @@ export default function CheckoutPage() {
                <h3 className="text-sm font-semibold uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">Ringkasan</h3>
                <div className="space-y-4 text-sm opacity-80 mb-6">
                  <div className="flex justify-between">
-                   <span>Produk (1x)</span>
-                   <span>Rp 1.500.000</span>
+                   <span className="truncate pr-4">{itemName}</span>
+                   <span className="whitespace-nowrap">Rp {itemPrice.toLocaleString('id-ID')}</span>
                  </div>
                  <div className="flex justify-between">
                    <span>Pengiriman</span>
@@ -99,7 +110,7 @@ export default function CheckoutPage() {
                </div>
                <div className="flex justify-between font-semibold border-t border-gray-200 pt-4 mb-4">
                  <span>Total Belanja</span>
-                 <span>Rp 1.500.000</span>
+                 <span>Rp {itemPrice.toLocaleString('id-ID')}</span>
                </div>
                
                <p className="text-[10px] text-gray-400 mt-6 leading-relaxed">
@@ -110,5 +121,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center pt-20">Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

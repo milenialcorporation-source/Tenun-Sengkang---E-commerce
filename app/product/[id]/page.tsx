@@ -70,10 +70,10 @@ export default function ProductPage() {
 
              <div className="space-y-6">
                <div className="flex gap-4">
-                 <button className="flex-1 bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
+                 <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
                    Add to Cart
-                 </button>
-                 <Link href="/checkout" className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
+                 </Link>
+                 <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
                    Beli Sekarang
                  </Link>
                  <button className="px-5 border border-gray-200 hover:border-black transition-colors">
