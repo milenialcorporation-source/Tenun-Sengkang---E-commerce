@@ -42,7 +42,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             {displayedProducts.map(product => (
               <div key={product.id} className="w-[85vw] sm:w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col">
-                <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 overflow-hidden block">
+                <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden block">
                   <Image 
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
                     alt={product.name} 

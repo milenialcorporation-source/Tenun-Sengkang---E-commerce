@@ -236,7 +236,7 @@ export default function Navbar() {
                 <ul className="space-y-6">
                   <li>
                     <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      Shop All
+                      Semua Produk
                     </Link>
                   </li>
                   <li>
@@ -244,7 +244,7 @@ export default function Navbar() {
                       onClick={() => setExpandedMenu(expandedMenu === 'products' ? null : 'products')}
                       className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group"
                     >
-                      <span>Products</span>
+                      <span>Terlaris</span>
                       <ChevronRight className={`w-5 h-5 opacity-40 group-hover:opacity-100 transition-all ${expandedMenu === 'products' ? 'rotate-90' : ''}`} strokeWidth={1.5} />
                     </button>
                     <AnimatePresence>
@@ -271,7 +271,7 @@ export default function Navbar() {
                       onClick={() => setExpandedMenu(expandedMenu === 'collections' ? null : 'collections')}
                       className="w-full flex items-center justify-between text-xl font-serif hover:text-gray-500 transition-colors group"
                     >
-                      <span>Collections</span>
+                      <span>Koleksi Kami</span>
                       <ChevronRight className={`w-5 h-5 opacity-40 group-hover:opacity-100 transition-all ${expandedMenu === 'collections' ? 'rotate-90' : ''}`} strokeWidth={1.5} />
                     </button>
                     <AnimatePresence>
