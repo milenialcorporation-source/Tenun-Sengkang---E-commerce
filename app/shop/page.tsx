@@ -46,8 +46,24 @@ function ShopContent() {
         {/* Sidebar Filters */}
         <div className="w-full md:w-64 flex-shrink-0">
           <div className="sticky top-32">
-            <h3 className="text-xs uppercase tracking-widest font-semibold mb-6 pb-4 border-b border-gray-200">Kategori</h3>
-            <ul className="space-y-4">
+            <h3 className="text-xs uppercase tracking-widest font-semibold mb-6 pb-4 border-b border-gray-200 hidden md:block">Kategori</h3>
+            
+            {/* Mobile Dropdown Menu */}
+            <div className="md:hidden mb-8">
+              <select 
+                value={selectedCategory || ''} 
+                onChange={(e) => setSelectedCategory(e.target.value === '' ? null : e.target.value)}
+                className="w-full p-3 border border-gray-200 bg-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rounded-sm"
+              >
+                <option value="">Semua Kategori</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Desktop List Menu */}
+            <ul className="space-y-4 hidden md:block">
               <li>
                 <button 
                   onClick={() => setSelectedCategory(null)}
@@ -69,7 +85,7 @@ function ShopContent() {
             </ul>
              
              {/* Catalog Toggle Display Info */}
-             <div className="mt-12 p-4 bg-gray-50 text-xs text-center border border-gray-100 rounded-sm">
+             <div className="mt-8 md:mt-12 p-4 bg-gray-50 text-xs text-center border border-gray-100 rounded-sm">
                 <span className="block opacity-50 mb-1 uppercase tracking-widest">Sistem Katalog</span>
                 <span className="font-semibold">{state.showOlsera ? 'Hibrida (Olsera + Manual)' : 'Manual Saja'}</span>
              </div>
@@ -78,7 +94,7 @@ function ShopContent() {
 
         {/* Product Grid */}
         <div className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 lg:gap-x-8 gap-y-8 lg:gap-y-12">
             {filteredProducts.map(product => (
               <Link href={`/product/${product.id}`} key={product.id} className="group block">
                 <div className="relative aspect-[3/4] mb-4 bg-gray-50 border border-gray-200 overflow-hidden">
@@ -109,7 +125,13 @@ function ShopContent() {
                   <h3 className="font-serif text-lg mb-1">{product.name}</h3>
                   <div className="flex justify-between items-center text-sm">
                     <span className="opacity-60">{product.category}</span>
-                    <span className="font-semibold text-accent">Rp {Number(product.price || 0).toLocaleString('id-ID')}</span>
+                    <span className="font-semibold text-accent">
+                      Rp {Number(product.price || 0).toLocaleString('id-ID')}
+                      <span className="text-xs text-gray-400 ml-1 font-normal lowercase">
+                        {/* @ts-ignore */}
+                        / {product.uom?.replace(/per /i, '') || 'pcs'}
+                      </span>
+                    </span>
                   </div>
                 </div>
               </Link>

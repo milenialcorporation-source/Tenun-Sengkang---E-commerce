@@ -61,8 +61,15 @@ export default function ProductPage() {
              <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="mb-2 text-xs uppercase tracking-widest text-accent font-semibold hover:underline block w-fit">
                {product.category}
              </Link>
-             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl mb-6">{product.name}</h1>
-             <p className="text-2xl opacity-80 mb-10">Rp {Number(product.price || 0).toLocaleString('id-ID')}</p>
+             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl mb-4">{product.name}</h1>
+             <p className="text-2xl opacity-80 mb-8">
+               Rp {Number(product.price || 0).toLocaleString('id-ID')}
+               <span className="text-sm border ml-2 border-gray-200 px-2 py-1 rounded text-gray-500 font-sans tracking-wide">
+                 {/* Fallback to / Pcs if UOM is not defined */}
+                 {/* @ts-ignore */}
+                 {product.uom || 'Per Pcs'}
+               </span>
+             </p>
              
              <div className="prose prose-sm opacity-70 mb-12">
                <p>{product.description}</p>
@@ -70,15 +77,15 @@ export default function ProductPage() {
 
              <div className="space-y-6">
                <div className="flex gap-4">
-                 <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
+                 <Link href="/cart" className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
                    Add to Cart
                  </Link>
                  <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
                    Beli Sekarang
                  </Link>
-                 <button className="px-5 border border-gray-200 hover:border-black transition-colors">
+                 <Link href="/login" className="px-5 border border-gray-200 hover:border-black transition-colors flex items-center justify-center">
                    ♡
-                 </button>
+                 </Link>
                </div>
                
                {(product.tokopediaLink || product.shopeeLink) && (
@@ -102,17 +109,89 @@ export default function ProductPage() {
                <p className="text-xs text-center opacity-50 pt-2">Pengiriman gratis untuk pesanan di atas Rp 2.000.000</p>
              </div>
 
-             <div className="mt-16 border-t border-gray-200 pt-8">
-               <details className="group">
-                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest">
-                   <span>Rincian Bahan & Perawatan</span>
+             <div className="mt-16 border-t border-gray-200 divide-y divide-gray-200">
+               {/* Informasi Ongkos Kirim */}
+               <details className="group py-5">
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Informasi Ongkos Kirim</span>
+                   <span className="transition group-open:rotate-180">
+                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                   </span>
+                 </summary>
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed space-y-3">
+                   <p>Pilih tipe pengiriman untuk melihat estimasi ongkos kirim. Pengiriman tersedia ke seluruh Indonesia.</p>
+                   <select className="w-full p-3 border border-gray-200 bg-white text-sm focus:outline-none focus:border-black appearance-none">
+                     <option>Pilih Provinsi Tujuan</option>
+                     <option>Sulawesi Selatan</option>
+                     <option>DKI Jakarta</option>
+                     <option>Jawa Barat</option>
+                   </select>
+                 </div>
+               </details>
+
+               {/* Informasi Panduan Ukuran */}
+               <details className="group py-5">
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Informasi Panduan Ukuran</span>
+                   <span className="transition group-open:rotate-180">
+                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                   </span>
+                 </summary>
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
+                   <p>Setiap produk memiliki ukuran standar. Untuk produk kain, lebar standar adalah 115cm. Silakan hubungi admin untuk ukuran khusus (custom).</p>
+                 </div>
+               </details>
+
+               {/* Informasi Deskripsi Produk */}
+               <details className="group py-5">
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Informasi Deskripsi Produk</span>
+                   <span className="transition group-open:rotate-180">
+                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                   </span>
+                 </summary>
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
+                   <p>{product.description}</p>
+                 </div>
+               </details>
+
+               {/* Rincian / Spesifikasi Bahan & Material */}
+               <details className="group py-5" open>
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Rincian Bahan & Material</span>
                    <span className="transition group-open:rotate-180">
                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                    </span>
                  </summary>
                  <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
-                   Ditenun menggunakan 100% benang sutra asli. Keringkan di tempat teduh. Cuci kering (dry clean) sangat disarankan untuk menjaga keawetan warna dan kilau sutra.
+                   Ditenun menggunakan 100% benang sutra asli pilihan dengan teknik tradisional Sengkang. Kain ini memiliki kilau alami dan tekstur yang lembut serta nyaman di kulit.
                  </p>
+               </details>
+
+               {/* Panduan Perawatan */}
+               <details className="group py-5">
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Panduan Perawatan</span>
+                   <span className="transition group-open:rotate-180">
+                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                   </span>
+                 </summary>
+                 <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
+                   Keringkan di tempat teduh. Cuci kering (dry clean) sangat disarankan untuk menjaga keawetan warna dan kilau sutra. Jangan gunakan pemutih atau pelembut pakaian kimia. Setrika dengan suhu rendah atau gunakan pelapis.
+                 </p>
+               </details>
+
+               {/* Penilaian Pelanggan */}
+               <details className="group py-5">
+                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-sm uppercase tracking-widest hover:text-primary">
+                   <span>Penilaian Pelanggan</span>
+                   <span className="transition group-open:rotate-180">
+                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                   </span>
+                 </summary>
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed text-center py-6">
+                   <p>Belum ada ulasan untuk produk ini.</p>
+                 </div>
                </details>
              </div>
           </div>

@@ -41,7 +41,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
           <div ref={scrollRef} className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 px-[1px]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             {displayedProducts.map(product => (
-              <div key={product.id} className="w-[85vw] sm:w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col">
+              <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col">
                 <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden block">
                   <Image 
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
@@ -98,6 +98,10 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                   </Link>
                   <span className="font-medium tracking-wide whitespace-nowrap ml-4">
                     {Number(product.price || 0).toLocaleString('id-ID')} IDR
+                    <span className="text-[10px] text-gray-400 ml-1 font-normal tracking-normal lowercase">
+                      {/* @ts-ignore */}
+                      / {product.uom?.replace(/per /i, '') || 'pcs'}
+                    </span>
                   </span>
                 </div>
               </div>

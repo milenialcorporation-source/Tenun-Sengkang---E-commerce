@@ -99,8 +99,8 @@ function CheckoutContent() {
              <div className="bg-white p-6 border border-gray-200">
                <h3 className="text-sm font-semibold uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">Ringkasan</h3>
                <div className="space-y-4 text-sm opacity-80 mb-6">
-                 <div className="flex justify-between">
-                   <span className="truncate pr-4">{itemName}</span>
+                 <div className="flex justify-between items-start">
+                   <span className="pr-4">{itemName}</span>
                    <span className="whitespace-nowrap">Rp {itemPrice.toLocaleString('id-ID')}</span>
                  </div>
                  <div className="flex justify-between">
@@ -108,6 +108,17 @@ function CheckoutContent() {
                    <span>Gratis</span>
                  </div>
                </div>
+
+               {/* Voucher Section */}
+               <div className="mb-6 border-t border-gray-100 pt-6">
+                 <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Kode Voucher</label>
+                 <div className="flex gap-2">
+                   <input type="text" placeholder="Masukkan kode" className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-black bg-gray-50 focus:bg-white transition-colors uppercase" />
+                   <button className="bg-black text-white px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-gray-800 transition-colors whitespace-nowrap">Terapkan</button>
+                 </div>
+                 <button className="text-[10px] uppercase tracking-widest font-semibold text-primary mt-2 hover:underline">Lihat Voucher Tersedia</button>
+               </div>
+
                <div className="flex justify-between font-semibold border-t border-gray-200 pt-4 mb-4">
                  <span>Total Belanja</span>
                  <span>Rp {itemPrice.toLocaleString('id-ID')}</span>
