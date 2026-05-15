@@ -562,6 +562,16 @@ function ProductManager({ state, setState }: any) {
                     </select>
                   </div>
                   <div>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Unit of Measure (UOM)</label>
+                    <select value={prod.uom || ''} onChange={e => updateProd(prod.id, 'uom', e.target.value)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary bg-white">
+                      <option value="">-- Default (Per Pcs) --</option>
+                      <option value="Per Pcs">Per Pcs</option>
+                      <option value="Per Meter">Per Meter</option>
+                      <option value="Per Pasang">Per Pasang</option>
+                      <option value="Per Set">Per Set</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="text-[10px] uppercase font-semibold text-gray-400">Primary Image</label>
                     <div className="flex flex-col gap-2">
                       <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) updateProdImage(prod.id, 'base64', e.target.files[0]) }} className="text-xs text-gray-500 w-full"/>

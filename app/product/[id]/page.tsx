@@ -65,8 +65,6 @@ export default function ProductPage() {
              <p className="text-2xl opacity-80 mb-8">
                Rp {Number(product.price || 0).toLocaleString('id-ID')}
                <span className="text-sm border ml-2 border-gray-200 px-2 py-1 rounded text-gray-500 font-sans tracking-wide">
-                 {/* Fallback to / Pcs if UOM is not defined */}
-                 {/* @ts-ignore */}
                  {product.uom || 'Per Pcs'}
                </span>
              </p>

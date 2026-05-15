@@ -25,6 +25,7 @@ export type Product = {
   price: number;
   description: string;
   category: string;
+  uom?: string; // Unit of Measure (e.g., "Per Pcs", "Per Meter")
   image?: ImageInput;
   images?: ImageInput[];
   isManual: boolean;

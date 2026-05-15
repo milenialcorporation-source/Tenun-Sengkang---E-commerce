@@ -121,14 +121,13 @@ function ShopContent() {
                   )}
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <div>
-                  <h3 className="font-serif text-lg mb-1">{product.name}</h3>
-                  <div className="flex justify-between items-center text-sm">
+                <div className="mt-2">
+                  <h3 className="font-serif text-sm sm:text-lg mb-1 leading-tight line-clamp-2" title={product.name}>{product.name}</h3>
+                  <div className="flex flex-col gap-1 text-xs sm:text-sm">
                     <span className="opacity-60">{product.category}</span>
                     <span className="font-semibold text-accent">
                       Rp {Number(product.price || 0).toLocaleString('id-ID')}
-                      <span className="text-xs text-gray-400 ml-1 font-normal lowercase">
-                        {/* @ts-ignore */}
+                      <span className="text-[10px] sm:text-xs text-gray-400 ml-1 font-normal lowercase">
                         / {product.uom?.replace(/per /i, '') || 'pcs'}
                       </span>
                     </span>
