@@ -41,8 +41,8 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
           <div ref={scrollRef} className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 px-[1px]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             {displayedProducts.map(product => (
-              <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col">
-                <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden block">
+              <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col min-w-0">
+                <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden block w-full">
                   <Image 
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
                     alt={product.name} 
@@ -76,29 +76,29 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                 {/* Color Swatches */}
                 {(Array.isArray(product.images) && product.images.length > 0) && (
                   <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-                    <div className="w-6 h-6 border border-black relative overflow-hidden cursor-pointer transition-colors">
+                    <div className="w-6 h-6 border border-black relative overflow-hidden cursor-pointer transition-colors flex-shrink-0">
                        <Image src={product.image?.data || 'https://picsum.photos/50/50'} fill alt="Main" className="object-cover" />
                     </div>
                     {product.images.slice(0, 3).map((img: any, idx: number) => (
-                      <div key={idx} className="w-6 h-6 border border-gray-300 relative overflow-hidden cursor-pointer hover:border-black transition-colors opacity-80 hover:opacity-100">
+                      <div key={idx} className="w-6 h-6 border border-gray-300 relative overflow-hidden cursor-pointer hover:border-black transition-colors opacity-80 hover:opacity-100 flex-shrink-0">
                          <Image src={img.data || 'https://picsum.photos/50/50'} fill alt={`swatch ${idx}`} className="object-cover" />
                       </div>
                     ))}
                     {product.images.length > 3 && (
-                      <span className="text-xs text-gray-500 ml-1">+ {product.images.length - 3}</span>
+                      <span className="text-xs text-gray-500 ml-1 flex-shrink-0 whitespace-nowrap">+ {product.images.length - 3}</span>
                     )}
                   </div>
                 )}
 
                 {/* Product Details */}
-                <div className="flex flex-col mt-2">
-                  <Link href={`/product/${product.id}`} className="block hover:underline mb-1 w-full">
+                <div className="flex flex-col mt-2 w-full min-w-0">
+                  <Link href={`/product/${product.id}`} className="block hover:underline mb-1 w-full min-w-0">
                     <h3 className="font-semibold text-sm sm:text-base text-[#1a1a1a] leading-tight line-clamp-2 break-words" title={product.name}>{product.name}</h3>
                     <p className="text-gray-500 text-[10px] sm:text-xs tracking-wide mt-1 truncate" title={product.category}>{product.category}</p>
                   </Link>
-                  <span className="font-medium text-sm sm:text-base tracking-wide mt-0.5">
+                  <span className="font-medium text-sm sm:text-base tracking-wide mt-0.5 truncate w-full flex items-center flex-wrap">
                     {Number(product.price || 0).toLocaleString('id-ID')} IDR
-                    <span className="text-[10px] text-gray-400 ml-1 font-normal tracking-normal lowercase">
+                    <span className="text-[10px] text-gray-400 ml-1 font-normal tracking-normal lowercase flex-shrink-0">
                       / {product.uom?.replace(/per /i, '') || 'pcs'}
                     </span>
                   </span>

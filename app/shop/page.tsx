@@ -121,13 +121,13 @@ function ShopContent() {
                   )}
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <div className="mt-3">
-                  <h3 className="font-serif text-sm sm:text-lg mb-1 leading-tight line-clamp-2 break-words" title={product.name}>{product.name}</h3>
-                  <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-[10px] sm:text-xs text-gray-500 truncate" title={product.category}>{product.category}</span>
-                    <span className="font-semibold text-accent text-sm sm:text-base mt-0.5">
+                <div className="mt-3 w-full min-w-0">
+                  <h3 className="font-serif text-sm sm:text-lg mb-1 leading-tight line-clamp-2 break-words w-full" title={product.name}>{product.name}</h3>
+                  <div className="flex flex-col gap-1 mt-1 w-full min-w-0">
+                    <span className="text-[10px] sm:text-xs text-gray-500 truncate w-full" title={product.category}>{product.category}</span>
+                    <span className="font-semibold text-accent text-sm sm:text-base mt-0.5 w-full flex flex-wrap items-center">
                       Rp {Number(product.price || 0).toLocaleString('id-ID')}
-                      <span className="text-[10px] sm:text-xs text-gray-400 ml-1 font-normal lowercase">
+                      <span className="text-[10px] sm:text-xs text-gray-400 ml-1 font-normal lowercase flex-shrink-0">
                         / {product.uom?.replace(/per /i, '') || 'pcs'}
                       </span>
                     </span>
