@@ -4,13 +4,21 @@ import React from 'react';
 import Link from 'next/link';
 
 export default function LoginPage() {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isLoggedIn', 'true');
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pt-20 pb-24">
       <div className="max-w-md mx-auto px-4">
         <h1 className="font-serif text-4xl text-center mb-2">My Account</h1>
         <p className="text-center text-sm text-gray-500 mb-10 uppercase tracking-widest font-semibold">Sign In to Continue</p>
         
-        <form className="space-y-6" onSubmit={e => e.preventDefault()}>
+        <form className="space-y-6" onSubmit={handleLogin}>
           <div>
             <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Email Address</label>
             <input 

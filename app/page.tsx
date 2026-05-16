@@ -9,6 +9,32 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 function FeaturedSectionView({ section, products = [], collections = [] }: { section: any, products: any[], collections: any[] }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      const stored = localStorage.getItem('wishlist');
+      if (stored) {
+        setWishlist(JSON.parse(stored));
+      }
+    }
+  }, []);
+
+  const toggleWishlist = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = '/login';
+      return;
+    }
+
+    setWishlist(prev => {
+      const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      localStorage.setItem('wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
 
   let displayedProducts = [];
   if (section.type === 'category' && section.categoryId) {
@@ -42,36 +68,44 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             {displayedProducts.map(product => (
               <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col min-w-0">
-                <Link href={`/product/${product.id}`} className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden block w-full">
-                  <Image 
-                    src={product.image?.data || 'https://picsum.photos/600/800'} 
-                    alt={product.name} 
-                    fill 
-                    className={`object-cover transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:opacity-90'}`}
-                    referrerPolicy="no-referrer"
-                  />
-                  {(Array.isArray(product.images) && product.images.length > 0) && (
-                    <Image
-                      src={product.images[0].data || 'https://picsum.photos/600/800'}
-                      alt={`${product.name} alternate`}
-                      fill
-                      className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                <div className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden w-full">
+                  <Link href={`/product/${product.id}`} className="block w-full h-full relative">
+                    <Image 
+                      src={product.image?.data || 'https://picsum.photos/600/800'} 
+                      alt={product.name} 
+                      fill 
+                      className={`object-cover transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:opacity-90'}`}
                       referrerPolicy="no-referrer"
                     />
-                  )}
-                  
-                  {/* NEW Badge */}
-                  <div className="absolute top-3 left-3 bg-white px-2 py-1">
-                    <span className="text-[10px] sm:text-xs font-semibold tracking-wider uppercase text-[#1a1a1a]">New</span>
-                  </div>
+                    {(Array.isArray(product.images) && product.images.length > 0) && (
+                      <Image
+                        src={product.images[0].data || 'https://picsum.photos/600/800'}
+                        alt={`${product.name} alternate`}
+                        fill
+                        className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+                    
+                    {/* NEW Badge */}
+                    <div className="absolute top-3 left-3 bg-white px-2 py-1">
+                      <span className="text-[10px] sm:text-xs font-semibold tracking-wider uppercase text-[#1a1a1a]">New</span>
+                    </div>
+                  </Link>
 
                   {/* Heart Icon (Mock for Add to Wishlist) */}
-                  <button onClick={(e) => e.preventDefault()} className="absolute bottom-3 right-3 bg-white p-2 hover:bg-gray-50 transition-colors z-10" aria-label="Add to wishlist">
-                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                     </svg>
-                  </button>
-                </Link>
+                  <div className="absolute bottom-3 right-3 z-10 block pointer-events-auto">
+                    <button 
+                      onClick={(e) => toggleWishlist(e, product.id)} 
+                      className={`block bg-white p-2 hover:bg-gray-50 transition-colors ${wishlist.includes(product.id) ? 'text-red-500' : 'text-gray-600'}`} 
+                      aria-label="Add to wishlist"
+                    >
+                       <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                       </svg>
+                    </button>
+                  </div>
+                </div>
 
                 {/* Color Swatches */}
                 {(Array.isArray(product.images) && product.images.length > 0) && (

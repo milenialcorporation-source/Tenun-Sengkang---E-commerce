@@ -13,6 +13,30 @@ export default function ProductPage() {
   const { state } = useStore();
   const product = (state.products || []).find(p => p.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [wishlist, setWishlist] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      const stored = localStorage.getItem('wishlist');
+      if (stored) {
+        setWishlist(JSON.parse(stored));
+      }
+    }
+  }, []);
+
+  const toggleWishlist = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = '/login';
+      return;
+    }
+
+    setWishlist(prev => {
+      const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      localStorage.setItem('wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
 
   if (!product) {
     return (
@@ -81,9 +105,11 @@ export default function ProductPage() {
                  <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
                    Beli Sekarang
                  </Link>
-                 <Link href="/login" className="px-5 border border-gray-200 hover:border-black transition-colors flex items-center justify-center">
-                   ♡
-                 </Link>
+                 <button onClick={(e) => toggleWishlist(e, product.id)} className={`px-5 border border-gray-200 transition-colors flex items-center justify-center ${wishlist.includes(product.id) ? 'text-red-500 border-red-200' : 'hover:border-black text-gray-600'}`}>
+                   <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                   </svg>
+                 </button>
                </div>
                
                {(product.tokopediaLink || product.shopeeLink) && (
