@@ -91,12 +91,12 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
                 )}
 
                 {/* Product Details */}
-                <div className="flex flex-col text-xs sm:text-sm mt-1">
-                  <Link href={`/product/${product.id}`} className="block hover:underline mb-1">
-                    <h3 className="font-semibold text-[#1a1a1a] leading-tight line-clamp-2" title={product.name}>{product.name}</h3>
-                    <p className="text-gray-400 text-[10px] sm:text-xs tracking-wide mt-1">{product.category}</p>
+                <div className="flex flex-col mt-2">
+                  <Link href={`/product/${product.id}`} className="block hover:underline mb-1 w-full">
+                    <h3 className="font-semibold text-sm sm:text-base text-[#1a1a1a] leading-tight line-clamp-2 break-words" title={product.name}>{product.name}</h3>
+                    <p className="text-gray-500 text-[10px] sm:text-xs tracking-wide mt-1 truncate" title={product.category}>{product.category}</p>
                   </Link>
-                  <span className="font-medium tracking-wide mt-0.5">
+                  <span className="font-medium text-sm sm:text-base tracking-wide mt-0.5">
                     {Number(product.price || 0).toLocaleString('id-ID')} IDR
                     <span className="text-[10px] text-gray-400 ml-1 font-normal tracking-normal lowercase">
                       / {product.uom?.replace(/per /i, '') || 'pcs'}
