@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { ShoppingBag, Menu, X, Search, Heart, User, Camera, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
@@ -13,8 +13,17 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check auth status on mount and when pathname changes
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+    }
+  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -46,6 +55,17 @@ export default function Navbar() {
   const hProducts = (state.products || []).filter(p => (state.hamburgerProducts || []).includes(p.id));
   const hCollections = (state.collections || []).filter(c => (state.hamburgerCollections || []).includes(c.id));
 
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      setIsLoggedIn(false);
+      setIsMenuOpen(false);
+      router.push('/');
+    }
+  };
+
   return (
     <>
       <nav ref={searchRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -59,7 +79,7 @@ export default function Navbar() {
                  <input 
                     type="text" 
                     placeholder="SEARCH" 
-                    className="outline-none text-sm w-full uppercase tracking-widest bg-transparent outline-none ring-0 border-none placeholder:text-gray-400"
+                    className="outline-none text-sm w-full uppercase tracking-widest bg-transparent ring-0 border-none placeholder:text-gray-400"
                     autoFocus
                   />
                  <button onClick={() => setIsSearchOpen(false)} className="ml-4">
@@ -123,7 +143,7 @@ export default function Navbar() {
 
               {/* Right section: Icons */}
               <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
-                <Link href="/login" className="hover:opacity-70 transition-opacity">
+                <Link href={isLoggedIn ? "/account" : "/login"} className="hover:opacity-70 transition-opacity">
                   <User className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
                 </Link>
                 <Link href="/cart" className="hover:opacity-70 transition-opacity">
@@ -304,9 +324,15 @@ export default function Navbar() {
               {/* Drawer Footer */}
               <div className="p-8 border-t border-gray-100 bg-gray-50">
                 <div className="flex gap-4">
-                  <Link href="/login" className="text-xs font-semibold uppercase tracking-widest border-b border-black pb-1 hover:text-primary hover:border-primary transition-all" onClick={() => setIsMenuOpen(false)}>
-                    Sign In / Register
-                  </Link>
+                  {isLoggedIn ? (
+                    <button onClick={handleLogout} className="text-xs font-semibold uppercase tracking-widest border-b border-black pb-1 hover:text-primary hover:border-primary transition-all">
+                      Sign Out
+                    </button>
+                  ) : (
+                    <Link href="/login" className="text-xs font-semibold uppercase tracking-widest border-b border-black pb-1 hover:text-primary hover:border-primary transition-all" onClick={() => setIsMenuOpen(false)}>
+                      Sign In / Register
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>

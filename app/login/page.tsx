@@ -3,23 +3,40 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (typeof window !== 'undefined') {
+      const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
       localStorage.setItem('isLoggedIn', 'true');
-      window.location.href = '/';
+      localStorage.setItem('userEmail', email);
+      window.location.href = '/account';
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (typeof window !== 'undefined') {
+      const name = (e.currentTarget.elements.namedItem('name') as HTMLInputElement).value;
+      const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+      const pass = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
+      const confirmPass = (e.currentTarget.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+      
+      if (pass !== confirmPass) {
+        alert("Passwords do not match");
+        return;
+      }
+      
       localStorage.setItem('isLoggedIn', 'true');
-      window.location.href = '/';
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userEmail', email);
+      window.location.href = '/account';
     }
   };
 
@@ -42,6 +59,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Email Address</label>
                   <input 
+                    name="email"
                     type="email" 
                     required
                     className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white"
@@ -53,12 +71,22 @@ export default function LoginPage() {
                     <span>Password</span>
                     <Link href="#" className="font-normal opacity-70 hover:opacity-100">Forgot?</Link>
                   </label>
-                  <input 
-                    type="password" 
-                    required
-                    className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input 
+                      name="password"
+                      type={showPassword ? "text" : "password"} 
+                      required
+                      className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 
                 <button className="w-full bg-black text-white py-4 uppercase tracking-widest text-sm font-semibold hover:bg-gray-800 transition-colors">
@@ -93,6 +121,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Full Name</label>
                   <input 
+                    name="name"
                     type="text" 
                     required
                     className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white"
@@ -102,6 +131,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Email Address</label>
                   <input 
+                    name="email"
                     type="email" 
                     required
                     className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white"
@@ -110,13 +140,43 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Password</label>
-                  <input 
-                    type="password" 
-                    required
-                    minLength={8}
-                    className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input 
+                      name="password"
+                      type={showPassword ? "text" : "password"} 
+                      required
+                      minLength={8}
+                      className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Confirm Password</label>
+                  <div className="relative">
+                    <input 
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"} 
+                      required
+                      minLength={8}
+                      className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-gray-50 focus:bg-white pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 
                 <button className="w-full bg-black text-white py-4 uppercase tracking-widest text-sm font-semibold hover:bg-gray-800 transition-colors">

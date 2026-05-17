@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,16 +10,20 @@ import { ChevronLeft } from 'lucide-react';
 export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter();
   const { state } = useStore();
   const product = (state.products || []).find(p => p.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [wishlist, setWishlist] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
+    if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true') {
       const stored = localStorage.getItem('wishlist');
       if (stored) {
-        setWishlist(JSON.parse(stored));
+        const timeout = setTimeout(() => {
+          setWishlist(JSON.parse(stored));
+        }, 0);
+        return () => clearTimeout(timeout);
       }
     }
   }, []);
@@ -27,13 +31,13 @@ export default function ProductPage() {
   const toggleWishlist = (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
     if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') !== 'true') {
-      window.location.href = '/login';
+      router.push('/login');
       return;
     }
 
     setWishlist(prev => {
       const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
-      localStorage.setItem('wishlist', JSON.stringify(next));
+      if (typeof window !== 'undefined') localStorage.setItem('wishlist', JSON.stringify(next));
       return next;
     });
   };

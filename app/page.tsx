@@ -6,16 +6,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 function FeaturedSectionView({ section, products = [], collections = [] }: { section: any, products: any[], collections: any[] }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
+    if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true') {
       const stored = localStorage.getItem('wishlist');
       if (stored) {
-        setWishlist(JSON.parse(stored));
+        const timeout = setTimeout(() => {
+          setWishlist(JSON.parse(stored));
+        }, 0);
+        return () => clearTimeout(timeout);
       }
     }
   }, []);
@@ -25,13 +30,13 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
     e.stopPropagation();
     
     if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') !== 'true') {
-      window.location.href = '/login';
+      router.push('/login');
       return;
     }
 
     setWishlist(prev => {
       const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
-      localStorage.setItem('wishlist', JSON.stringify(next));
+      if (typeof window !== 'undefined') localStorage.setItem('wishlist', JSON.stringify(next));
       return next;
     });
   };
