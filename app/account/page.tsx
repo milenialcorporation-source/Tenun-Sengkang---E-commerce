@@ -32,14 +32,42 @@ export default function AccountPage() {
         setUserName(storedName || 'Anda');
         setUserEmail(storedEmail || 'email@example.com');
 
-        const userOrdersStr = localStorage.getItem('user_orders');
-        if (userOrdersStr) {
-          setOrders(JSON.parse(userOrdersStr));
-        }
+        const fetchUserData = async (email: string) => {
+          try {
+            // Fetch Orders
+            const ordersRes = await fetch(`/api/orders?email=${encodeURIComponent(email)}`);
+            const ordersData = await ordersRes.json();
+            if (ordersRes.ok && ordersData.success) {
+              setOrders(ordersData.orders.map((o: any) => ({
+                id: o.id,
+                date: new Date(o.created_at).toISOString().split('T')[0],
+                total: o.total,
+                status: o.status,
+                items: o.items
+              })));
+            }
+            
+            // Fetch Wishlist
+            const wishlistRes = await fetch(`/api/wishlist?email=${encodeURIComponent(email)}`);
+            const wishlistData = await wishlistRes.json();
+            if (wishlistRes.ok && wishlistData.success) {
+              setWishlistIds(wishlistData.wishlist);
+              localStorage.setItem('wishlist', JSON.stringify(wishlistData.wishlist));
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        };
 
-        const wishlistStr = localStorage.getItem('wishlist');
-        if (wishlistStr) {
-          setWishlistIds(JSON.parse(wishlistStr));
+        if (storedEmail) {
+          fetchUserData(storedEmail);
+        } else {
+          // Fallback if no email (shouldn't happen if logged in)
+          const userOrdersStr = localStorage.getItem('user_orders');
+          if (userOrdersStr) setOrders(JSON.parse(userOrdersStr));
+
+          const wishlistStr = localStorage.getItem('wishlist');
+          if (wishlistStr) setWishlistIds(JSON.parse(wishlistStr));
         }
       }, 0);
       return () => clearTimeout(timeout);

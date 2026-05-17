@@ -65,6 +65,27 @@ export async function initializeDatabase() {
       )
     `);
     
+    await query(`
+      CREATE TABLE IF NOT EXISTS wishlist (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_email VARCHAR(255) NOT NULL,
+        product_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY user_product (user_email, product_id)
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id VARCHAR(255) PRIMARY KEY,
+        user_email VARCHAR(255) NOT NULL,
+        total DECIMAL(10, 2) NOT NULL,
+        status VARCHAR(50) NOT NULL,
+        items TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
     const rows = await query("SELECT COUNT(*) as count FROM store_state") as any[];
     if (rows[0].count === 0) {
       await query("INSERT INTO store_state (data) VALUES (?)", ['{}']);

@@ -15,17 +15,30 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true') {
-      const stored = localStorage.getItem('wishlist');
-      if (stored) {
-        const timeout = setTimeout(() => {
-          setWishlist(JSON.parse(stored));
-        }, 0);
-        return () => clearTimeout(timeout);
-      }
+      const fetchWishlist = async () => {
+        const email = localStorage.getItem('userEmail');
+        if (email) {
+          try {
+            const res = await fetch(`/api/wishlist?email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+            if (res.ok && data.success) {
+              setWishlist(data.wishlist);
+              localStorage.setItem('wishlist', JSON.stringify(data.wishlist));
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      };
+      
+      const timeout = setTimeout(() => {
+        fetchWishlist();
+      }, 0);
+      return () => clearTimeout(timeout);
     }
   }, []);
 
-  const toggleWishlist = (e: React.MouseEvent, productId: string) => {
+  const toggleWishlist = async (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -34,11 +47,27 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
       return;
     }
 
+    const email = localStorage.getItem('userEmail');
+    const isAdding = !wishlist.includes(productId);
+    
+    // Optimistic update
     setWishlist(prev => {
       const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
       if (typeof window !== 'undefined') localStorage.setItem('wishlist', JSON.stringify(next));
       return next;
     });
+
+    if (email) {
+      try {
+        await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, productId, action: isAdding ? 'add' : 'remove' })
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   let displayedProducts = [];

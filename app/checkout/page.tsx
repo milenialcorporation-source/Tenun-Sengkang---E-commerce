@@ -79,24 +79,43 @@ function CheckoutContent() {
                 </div>
                 
                 <button 
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      const newOrder = {
-                        id: `ORD-${Date.now()}`,
-                        date: new Date().toISOString().split('T')[0],
-                        total: itemPrice,
-                        status: 'Processing',
-                        items: itemName
-                      };
-                      const userOrdersStr = localStorage.getItem('user_orders');
-                      const userOrders = userOrdersStr ? JSON.parse(userOrdersStr) : [];
-                      userOrders.push(newOrder);
-                      localStorage.setItem('user_orders', JSON.stringify(userOrders));
-                      alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.');
-                      // Clean up cart if needed (simplification here)
-                      if (!productId) localStorage.removeItem('cart');
-                      window.location.href = '/account';
+                  onClick={async () => {
+                    const email = localStorage.getItem('userEmail');
+                    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+                    const newOrder = {
+                      orderId: `ORD-${Date.now()}`,
+                      total: itemPrice,
+                      items: itemName
+                    };
+
+                    if (isLoggedIn && email) {
+                       try {
+                         await fetch('/api/orders', {
+                           method: 'POST',
+                           headers: { 'Content-Type': 'application/json' },
+                           body: JSON.stringify({ ...newOrder, email })
+                         });
+                       } catch (e) {
+                         console.error(e);
+                       }
+                    } else {
+                       // Fallback to local storage for guests
+                       const userOrdersStr = localStorage.getItem('user_orders');
+                       const userOrders = userOrdersStr ? JSON.parse(userOrdersStr) : [];
+                       userOrders.push({
+                         id: newOrder.orderId,
+                         date: new Date().toISOString().split('T')[0],
+                         total: newOrder.total,
+                         status: 'Processing',
+                         items: newOrder.items
+                       });
+                       localStorage.setItem('user_orders', JSON.stringify(userOrders));
                     }
+
+                    alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.');
+                    if (!productId) localStorage.removeItem('cart');
+                    window.location.href = '/account';
                   }}
                   className="w-full bg-primary text-white py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#a67c2e] transition-colors"
                 >
