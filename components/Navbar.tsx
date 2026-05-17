@@ -69,6 +69,17 @@ export default function Navbar() {
     }
   };
 
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = e.currentTarget.value;
+      if (query.trim() !== '') {
+        router.push(`/shop?q=${encodeURIComponent(query)}`);
+        setIsSearchOpen(false);
+      }
+    }
+  };
+
   return (
     <>
       <nav ref={searchRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -84,6 +95,7 @@ export default function Navbar() {
                     placeholder="SEARCH" 
                     className="outline-none text-sm w-full uppercase tracking-widest bg-transparent ring-0 border-none placeholder:text-gray-400"
                     autoFocus
+                    onKeyDown={handleSearch}
                   />
                  <button onClick={() => setIsSearchOpen(false)} className="ml-4">
                     <X className="w-5 h-5 text-black" />
@@ -119,12 +131,8 @@ export default function Navbar() {
                       placeholder="SEARCH" 
                       className="outline-none text-xs w-full uppercase tracking-widest bg-transparent placeholder:text-gray-400"
                       autoFocus={isSearchOpen}
+                      onKeyDown={handleSearch}
                     />
-                    {isSearchOpen && (
-                      <button className="text-gray-600 hover:text-black transition-colors">
-                        <Camera className="w-4 h-4" strokeWidth={1.5} />
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
@@ -193,9 +201,6 @@ export default function Navbar() {
                         </Link>
                       ))}
                     </div>
-                    <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors">
-                      <Camera className="w-4 h-4" /> Search By Image
-                    </button>
                   </div>
 
                   {/* Right Column: Featured Cards */}

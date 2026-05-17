@@ -10,7 +10,15 @@ function ShopContent() {
   const { state } = useStore();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category');
+  const initialQuery = searchParams.get('q');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
+  const [searchQuery, setSearchQuery] = useState<string | null>(initialQuery);
+
+  useEffect(() => {
+    setSearchQuery(searchParams.get('q'));
+    const categoryFromQuery = searchParams.get('category');
+    if (categoryFromQuery) setSelectedCategory(categoryFromQuery);
+  }, [searchParams]);
 
   // Derive categories from products + collections
   const categories = useMemo(() => {
@@ -26,16 +34,26 @@ function ShopContent() {
     if (selectedCategory) {
       p = p.filter(prod => prod.category === selectedCategory);
     }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      p = p.filter(prod => 
+        (prod.name && prod.name.toLowerCase().includes(q)) || 
+        (prod.description && prod.description.toLowerCase().includes(q)) ||
+        (prod.category && prod.category.toLowerCase().includes(q))
+      );
+    }
     // Handle mock Olsera integration logic if needed (currently UI only)
     return p;
-  }, [state.products, selectedCategory]);
+  }, [state.products, selectedCategory, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Shop Header */}
       <div className="bg-gradient-to-b from-[#fdfbf7] to-white py-16 px-4 mb-16 border-b border-gray-100">
         <div className="max-w-7xl mx-auto text-center mt-8">
-           <h1 className="font-serif text-5xl md:text-6xl mb-4">Koleksi Lengkap</h1>
+           <h1 className="font-serif text-5xl md:text-6xl mb-4">
+             {searchQuery ? `Pencarian: "${searchQuery}"` : 'Koleksi Lengkap'}
+           </h1>
            <p className="text-secondary opacity-60 max-w-xl mx-auto text-sm leading-relaxed">
              Temukan berbagai macam motif dan warna kain sutra Sengkang asli. Setiap potong adalah hasil karya seni yang bernilai tinggi.
            </p>

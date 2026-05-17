@@ -131,9 +131,22 @@ export default function ProductPage() {
 
              <div className="space-y-6">
                <div className="flex gap-4">
-                 <Link href="/cart" className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
+                 <button onClick={() => {
+                   if (typeof window !== 'undefined') {
+                     const existingCartStr = localStorage.getItem('cart');
+                     let cart = existingCartStr ? JSON.parse(existingCartStr) : [];
+                     const itemIndex = cart.findIndex((item: any) => item.id === product.id);
+                     if (itemIndex > -1) {
+                       cart[itemIndex].quantity += 1;
+                     } else {
+                       cart.push({ ...product, quantity: 1 });
+                     }
+                     localStorage.setItem('cart', JSON.stringify(cart));
+                     alert('Produk ditambahkan ke keranjang!');
+                   }
+                 }} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
                    Add to Cart
-                 </Link>
+                 </button>
                  <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
                    Beli Sekarang
                  </Link>
