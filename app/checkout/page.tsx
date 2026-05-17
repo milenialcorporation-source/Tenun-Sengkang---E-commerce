@@ -7,9 +7,21 @@ import { useStore } from '@/lib/store';
 
 function CheckoutContent() {
   const [step, setStep] = useState<1 | 2>(1);
+  const [email, setEmail] = useState('');
+  const [isAuth, setIsAuth] = useState(false);
   const searchParams = useSearchParams();
   const productId = searchParams.get('productId');
   const { state } = useStore();
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      setIsAuth(loggedIn);
+      if (loggedIn) {
+        setEmail(localStorage.getItem('userEmail') || '');
+      }
+    }
+  }, []);
 
   const product = (state.products || []).find(p => p.id === productId);
 
@@ -28,6 +40,14 @@ function CheckoutContent() {
             {step === 1 ? (
               <div>
                 <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-4">Informasi Pengiriman</h2>
+                {!isAuth && (
+                  <div className="bg-gray-50 border border-gray-200 p-4 mb-6 flex justify-between items-center">
+                    <p className="text-sm">Sudah punya akun?</p>
+                    <Link href="/login" className="text-xs uppercase tracking-widest font-semibold text-primary hover:underline">
+                      Masuk Di Sini
+                    </Link>
+                  </div>
+                )}
                 <form 
                   className="space-y-6"
                   onSubmit={(e) => {
@@ -47,7 +67,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Email (Untuk Notifikasi)</label>
-                    <input required type="email" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black bg-gray-50 focus:bg-white transition-colors" />
+                    <input id="checkout-email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} readOnly={isAuth} className={`w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors ${isAuth ? 'bg-gray-100 cursor-not-allowed opacity-70' : 'bg-gray-50 focus:bg-white'}`} />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest font-semibold text-gray-500 mb-2">Nomor Telepon / WhatsApp</label>
@@ -66,60 +86,83 @@ function CheckoutContent() {
               </div>
             ) : (
               <div>
-                <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-4">Pembayaran</h2>
+                <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-4">Pembayaran & Pengiriman</h2>
                 <div className="space-y-4 mb-8">
-                  <div className="border border-black p-4 bg-gray-50 flex items-center gap-4 cursor-pointer">
-                    <input type="radio" id="bank" name="payment" defaultChecked className="text-black focus:ring-black" />
-                    <label htmlFor="bank" className="text-sm font-medium uppercase tracking-widest cursor-pointer w-full">Transfer Bank (BCA/Mandiri)</label>
+                  <div className="border border-black p-4 bg-gray-50 flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-4">
+                      <input type="radio" id="xendit" name="payment" defaultChecked className="text-black focus:ring-black" />
+                      <label htmlFor="xendit" className="text-sm font-medium uppercase tracking-widest cursor-pointer">Xendit (Virtual Account / QRIS)</label>
+                    </div>
                   </div>
-                  <div className="border border-gray-200 p-4 flex items-center gap-4 cursor-pointer opacity-50">
-                    <input type="radio" id="gopay" name="payment" disabled className="text-black focus:ring-black" />
-                    <label htmlFor="gopay" className="text-sm font-medium uppercase tracking-widest cursor-not-allowed w-full">GoPay / QRIS (Coming Soon)</label>
+                  
+                  <div className="mt-8 border-t border-gray-100 pt-6">
+                    <h3 className="text-sm font-semibold uppercase tracking-widest mb-4">Pengiriman (KiriminAja)</h3>
+                    <div className="border border-gray-200 p-4 flex items-center gap-4 cursor-pointer hover:border-black transition-colors">
+                      <input type="radio" id="jneyes" name="shipping" defaultChecked className="text-black focus:ring-black" />
+                      <label htmlFor="jneyes" className="text-sm font-medium uppercase tracking-widest cursor-pointer w-full flex justify-between">
+                        <span>Reguler (2-3 Hari)</span>
+                        <span>Gratis</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
                 
                 <button 
                   onClick={async () => {
-                    const email = localStorage.getItem('userEmail');
+                    const emailInput = document.getElementById('checkout-email') as HTMLInputElement;
+                    const email = emailInput?.value || localStorage.getItem('userEmail') || 'guest@example.com';
                     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
                     const newOrder = {
                       orderId: `ORD-${Date.now()}`,
                       total: itemPrice,
-                      items: itemName
+                      items: itemName,
+                      isGuest: !isLoggedIn
                     };
 
-                    if (isLoggedIn && email) {
-                       try {
-                         await fetch('/api/orders', {
-                           method: 'POST',
-                           headers: { 'Content-Type': 'application/json' },
-                           body: JSON.stringify({ ...newOrder, email })
-                         });
-                       } catch (e) {
-                         console.error(e);
-                       }
-                    } else {
-                       // Fallback to local storage for guests
-                       const userOrdersStr = localStorage.getItem('user_orders');
-                       const userOrders = userOrdersStr ? JSON.parse(userOrdersStr) : [];
-                       userOrders.push({
-                         id: newOrder.orderId,
-                         date: new Date().toISOString().split('T')[0],
-                         total: newOrder.total,
-                         status: 'Processing',
-                         items: newOrder.items
-                       });
-                       localStorage.setItem('user_orders', JSON.stringify(userOrders));
+                    try {
+                      const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...newOrder, email })
+                      });
+                      
+                      const data = await res.json();
+                      
+                      if (res.ok && data.success) {
+                        // Keep local fallback
+                        if (!isLoggedIn) {
+                           const userOrdersStr = localStorage.getItem('user_orders');
+                           const userOrders = userOrdersStr ? JSON.parse(userOrdersStr) : [];
+                           userOrders.push({
+                             id: newOrder.orderId,
+                             date: new Date().toISOString().split('T')[0],
+                             total: newOrder.total,
+                             status: 'Payment Pending',
+                             items: newOrder.items
+                           });
+                           localStorage.setItem('user_orders', JSON.stringify(userOrders));
+                        }
+                        
+                        if (!productId) localStorage.removeItem('cart');
+                        
+                        if (data.invoiceUrl && data.invoiceUrl !== '/account') {
+                           window.location.href = data.invoiceUrl;
+                        } else {
+                           alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.');
+                           window.location.href = '/account';
+                        }
+                      } else {
+                        alert(data.error || 'Terjadi kesalahan saat checkout');
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      alert('Gagal menghubungi server.');
                     }
-
-                    alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.');
-                    if (!productId) localStorage.removeItem('cart');
-                    window.location.href = '/account';
                   }}
                   className="w-full bg-primary text-white py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#a67c2e] transition-colors"
                 >
-                  Selesaikan Pesanan
+                  Bayar dengan Xendit
                 </button>
                 <button 
                   onClick={() => setStep(1)}
