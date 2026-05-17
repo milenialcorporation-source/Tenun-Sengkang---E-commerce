@@ -79,7 +79,25 @@ function CheckoutContent() {
                 </div>
                 
                 <button 
-                  onClick={() => alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.')}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      const newOrder = {
+                        id: `ORD-${Date.now()}`,
+                        date: new Date().toISOString().split('T')[0],
+                        total: itemPrice,
+                        status: 'Processing',
+                        items: itemName
+                      };
+                      const userOrdersStr = localStorage.getItem('user_orders');
+                      const userOrders = userOrdersStr ? JSON.parse(userOrdersStr) : [];
+                      userOrders.push(newOrder);
+                      localStorage.setItem('user_orders', JSON.stringify(userOrders));
+                      alert('Pesanan Berhasil! Invoice akan dikirimkan ke email Anda.');
+                      // Clean up cart if needed (simplification here)
+                      if (!productId) localStorage.removeItem('cart');
+                      window.location.href = '/account';
+                    }
+                  }}
                   className="w-full bg-primary text-white py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#a67c2e] transition-colors"
                 >
                   Selesaikan Pesanan

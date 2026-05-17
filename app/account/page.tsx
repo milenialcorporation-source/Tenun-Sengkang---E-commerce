@@ -3,10 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useStore } from '@/lib/store';
+import Image from 'next/image';
+
+type Tab = 'account' | 'orders' | 'wishlist';
 
 export default function AccountPage() {
   const [userName, setUserName] = useState<string | null>('');
   const [userEmail, setUserEmail] = useState<string | null>('');
+  const [activeTab, setActiveTab] = useState<Tab>('account');
+  const [orders, setOrders] = useState<any[]>([]);
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const { state } = useStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -23,6 +31,16 @@ export default function AccountPage() {
       const timeout = setTimeout(() => {
         setUserName(storedName || 'Anda');
         setUserEmail(storedEmail || 'email@example.com');
+
+        const userOrdersStr = localStorage.getItem('user_orders');
+        if (userOrdersStr) {
+          setOrders(JSON.parse(userOrdersStr));
+        }
+
+        const wishlistStr = localStorage.getItem('wishlist');
+        if (wishlistStr) {
+          setWishlistIds(JSON.parse(wishlistStr));
+        }
       }, 0);
       return () => clearTimeout(timeout);
     }
@@ -37,6 +55,8 @@ export default function AccountPage() {
     }
   };
 
+  const wishlistProducts = (state.products || []).filter(p => wishlistIds.includes(p.id));
+
   return (
     <div className="min-h-screen bg-[#fcfbf9] pt-20 pb-24">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
@@ -49,40 +69,95 @@ export default function AccountPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sidebar */}
           <div className="md:col-span-1 space-y-2">
-            <Link href="/account" className="block px-4 py-3 bg-white border border-black font-semibold text-sm uppercase tracking-widest">
-              Dashboard
-            </Link>
-            <Link href="#" className="block px-4 py-3 bg-transparent text-gray-500 hover:bg-white hover:text-black transition-colors font-semibold text-sm uppercase tracking-widest">
-              Orders
-            </Link>
-            <Link href="#" className="block px-4 py-3 bg-transparent text-gray-500 hover:bg-white hover:text-black transition-colors font-semibold text-sm uppercase tracking-widest">
-              Wishlist
-            </Link>
-            <Link href="#" className="block px-4 py-3 bg-transparent text-gray-500 hover:bg-white hover:text-black transition-colors font-semibold text-sm uppercase tracking-widest">
+            <button 
+              onClick={() => setActiveTab('account')}
+              className={`w-full text-left block px-4 py-3 border font-semibold text-sm uppercase tracking-widest transition-colors ${activeTab === 'account' ? 'bg-white border-black text-black' : 'bg-transparent border-transparent text-gray-500 hover:bg-white hover:text-black'}`}
+            >
               Account Details
-            </Link>
+            </button>
+            <button 
+              onClick={() => setActiveTab('orders')}
+              className={`w-full text-left block px-4 py-3 border font-semibold text-sm uppercase tracking-widest transition-colors ${activeTab === 'orders' ? 'bg-white border-black text-black' : 'bg-transparent border-transparent text-gray-500 hover:bg-white hover:text-black'}`}
+            >
+              Orders
+            </button>
+            <button 
+              onClick={() => setActiveTab('wishlist')}
+              className={`w-full text-left block px-4 py-3 border font-semibold text-sm uppercase tracking-widest transition-colors ${activeTab === 'wishlist' ? 'bg-white border-black text-black' : 'bg-transparent border-transparent text-gray-500 hover:bg-white hover:text-black'}`}
+            >
+              Wishlist
+            </button>
           </div>
 
           {/* Main Content */}
           <div className="md:col-span-2">
-            <div className="bg-white p-8 border border-gray-100 shadow-sm mb-8">
-              <h2 className="font-serif text-2xl mb-6">Profile Information</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Name</p>
-                  <p className="text-base">{userName}</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Email</p>
-                  <p className="text-base">{userEmail}</p>
+            {activeTab === 'account' && (
+              <div className="bg-white p-8 border border-gray-100 shadow-sm mb-8">
+                <h2 className="font-serif text-2xl mb-6">Profile Information</h2>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Name</p>
+                    <p className="text-base">{userName}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Email</p>
+                    <p className="text-base">{userEmail}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="bg-white p-8 border border-gray-100 shadow-sm">
-              <h2 className="font-serif text-2xl mb-6">Recent Orders</h2>
-              <p className="text-gray-500 italic text-sm">No recent orders found. <Link href="/shop" className="text-primary underline not-italic hover:opacity-70">Start shopping.</Link></p>
-            </div>
+            {activeTab === 'orders' && (
+              <div className="bg-white p-8 border border-gray-100 shadow-sm mb-8">
+                <h2 className="font-serif text-2xl mb-6">Recent Orders</h2>
+                {orders.length > 0 ? (
+                  <div className="space-y-6">
+                    {orders.slice().reverse().map((order: any) => (
+                      <div key={order.id} className="border border-gray-200 p-4">
+                        <div className="flex justify-between items-start mb-4 border-b border-gray-100 pb-4">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Order {order.id}</p>
+                            <p className="text-sm font-medium">{order.date}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 uppercase tracking-widest font-semibold">{order.status}</span>
+                            <p className="text-sm font-medium mt-2">Rp {Number(order.total).toLocaleString('id-ID')}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm">{order.items}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic text-sm">No recent orders found. <Link href="/shop" className="text-primary underline not-italic hover:opacity-70">Start shopping.</Link></p>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'wishlist' && (
+              <div className="bg-white p-8 border border-gray-100 shadow-sm mb-8">
+                <h2 className="font-serif text-2xl mb-6">Your Wishlist</h2>
+                {wishlistProducts.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {wishlistProducts.map(product => (
+                      <Link key={product.id} href={`/product/${product.id}`} className="group block border border-gray-100 p-4 hover:border-gray-300 transition-colors">
+                        <div className="relative aspect-[3/4] mb-4 bg-gray-50">
+                          {product.images && product.images.length > 0 ? (
+                            <Image src={product.images[0]?.data || `https://picsum.photos/seed/${product.id}1/400/600`} alt={product.name || 'Product'} fill className="object-cover" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                          )}
+                        </div>
+                        <h4 className="text-sm font-semibold uppercase tracking-widest min-h[40px] leading-tight mb-2 group-hover:text-primary transition-colors">{product.name}</h4>
+                        <p className="text-sm">Rp {Number(product.price).toLocaleString('id-ID')}</p>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic text-sm">Your wishlist is empty. <Link href="/shop" className="text-primary underline not-italic hover:opacity-70">Find something you love.</Link></p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
