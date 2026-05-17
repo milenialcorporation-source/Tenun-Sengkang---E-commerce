@@ -10,33 +10,66 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (typeof window !== 'undefined') {
-      const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email);
-      window.location.href = '/account';
+    const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+    const pass = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userEmail', data.email);
+          localStorage.setItem('userName', data.name);
+          window.location.href = '/account';
+        }
+      } else {
+        alert(data.error || 'Invalid email or password');
+      }
+    } catch (err) {
+      alert('An error occurred during login. Please try again.');
     }
   };
 
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (typeof window !== 'undefined') {
-      const name = (e.currentTarget.elements.namedItem('name') as HTMLInputElement).value;
-      const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
-      const pass = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
-      const confirmPass = (e.currentTarget.elements.namedItem('confirmPassword') as HTMLInputElement).value;
-      
-      if (pass !== confirmPass) {
-        alert("Passwords do not match");
-        return;
+    const name = (e.currentTarget.elements.namedItem('name') as HTMLInputElement).value;
+    const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+    const pass = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
+    const confirmPass = (e.currentTarget.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+    
+    if (pass !== confirmPass) {
+      alert("Passwords do not match");
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: pass })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userName', data.name);
+          localStorage.setItem('userEmail', data.email);
+          window.location.href = '/account';
+        }
+      } else {
+        alert(data.error || 'Failed to register account');
       }
-      
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userName', name);
-      localStorage.setItem('userEmail', email);
-      window.location.href = '/account';
+    } catch (err) {
+      alert('An error occurred during registration. Please try again.');
     }
   };
 

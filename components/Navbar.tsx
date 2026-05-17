@@ -21,7 +21,10 @@ export default function Navbar() {
   useEffect(() => {
     // Check auth status on mount and when pathname changes
     if (typeof window !== 'undefined') {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      const timeout = setTimeout(() => {
+        setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      }, 0);
+      return () => clearTimeout(timeout);
     }
   }, [pathname]);
 
