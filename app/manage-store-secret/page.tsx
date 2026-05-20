@@ -96,14 +96,14 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-full md:w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <h2 className="font-serif text-xl">Admin Panel</h2>
           <p className="text-xs text-gray-500 mt-1">Kain Sutra Sengkang</p>
         </div>
-        <nav className="p-4 space-y-2 flex-1">
+        <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
           <TabButton active={activeTab === 'logo'} onClick={() => setActiveTab('logo')} icon={<ImageIcon size={18} />} label="Logo Manager" />
           <TabButton active={activeTab === 'hero'} onClick={() => setActiveTab('hero')} icon={<Layout size={18} />} label="Homepage Slides" />
           <TabButton active={activeTab === 'featuredSections'} onClick={() => setActiveTab('featuredSections')} icon={<Layout size={18} />} label="Featured Sections" />
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
           <TabButton active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Box size={18} />} label="Products" />
           <TabButton active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} icon={<ToggleLeft size={18} />} label="Catalog Control" />
         </nav>
-        <div className="p-4 border-t border-gray-200 space-y-2">
+        <div className="p-4 border-t border-gray-200 space-y-2 flex-shrink-0">
           {hasChanges && (
             <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-4 space-y-2">
                <p className="text-xs text-amber-800 font-medium">Unsaved changes!</p>
