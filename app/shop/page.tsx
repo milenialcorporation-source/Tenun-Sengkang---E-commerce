@@ -9,14 +9,14 @@ import { useSearchParams } from 'next/navigation';
 function ShopContent() {
   const { state } = useStore();
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get('category');
-  const initialQuery = searchParams.get('q');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
-  const [searchQuery, setSearchQuery] = useState<string | null>(initialQuery);
+  const initialCategory = searchParams?.get('category');
+  const initialQuery = searchParams?.get('q');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory || null);
+  const [searchQuery, setSearchQuery] = useState<string | null>(initialQuery || null);
 
   useEffect(() => {
-    setSearchQuery(searchParams.get('q'));
-    const categoryFromQuery = searchParams.get('category');
+    setSearchQuery(searchParams?.get('q') || null);
+    const categoryFromQuery = searchParams?.get('category');
     if (categoryFromQuery) setSelectedCategory(categoryFromQuery);
   }, [searchParams]);
 

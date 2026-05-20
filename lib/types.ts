@@ -31,6 +31,9 @@ export type Product = {
   isManual: boolean;
   shopeeLink?: string;
   tokopediaLink?: string;
+  material?: string;
+  careInstructions?: string;
+  sizeGuide?: string;
 };
 
 export type FeaturedSection = {

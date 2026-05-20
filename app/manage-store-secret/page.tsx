@@ -27,9 +27,20 @@ export default function AdminDashboard() {
 
   const hasChanges = JSON.stringify(state) !== JSON.stringify(savedState);
 
+  const [showAuth, setShowAuth] = useState(false);
+
+  useEffect(() => {
+    // Only show auth prompt if user knows the exact secret key via hash
+    if (window.location.hash === '#authorized-admin-access') {
+      setShowAuth(true);
+    }
+  }, []);
+
   const handleLogout = async () => {
     setIsPinCorrect(false);
     setPinEntry('');
+    window.location.hash = '';
+    setShowAuth(false);
   };
 
   const handleSave = async () => {
@@ -43,6 +54,17 @@ export default function AdminDashboard() {
       setIsSaving(false);
     }
   };
+
+  if (!showAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center text-gray-500">
+          <h1 className="text-2xl font-serif mb-2">404 - Page Not Found</h1>
+          <p>The page you are looking for does not exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isPinCorrect) {
     return (

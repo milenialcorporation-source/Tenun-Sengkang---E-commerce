@@ -9,7 +9,7 @@ import { ChevronLeft } from 'lucide-react';
 
 export default function ProductPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
   const router = useRouter();
   const { state } = useStore();
   const product = (state.products || []).find(p => p.id === id);
@@ -125,7 +125,7 @@ export default function ProductPage() {
                </span>
              </p>
              
-             <div className="prose prose-sm opacity-70 mb-12">
+             <div className="prose prose-sm opacity-70 mb-12 whitespace-pre-wrap">
                <p>{product.description}</p>
              </div>
 
@@ -206,8 +206,8 @@ export default function ProductPage() {
                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                    </span>
                  </summary>
-                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
-                   <p>Setiap produk memiliki ukuran standar. Untuk produk kain, lebar standar adalah 115cm. Silakan hubungi admin untuk ukuran khusus (custom).</p>
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed whitespace-pre-wrap">
+                   <p>{product.sizeGuide || "Setiap produk memiliki ukuran standar. Untuk produk kain, lebar standar adalah 115cm. Silakan hubungi admin untuk ukuran khusus (custom)."}</p>
                  </div>
                </details>
 
@@ -219,7 +219,7 @@ export default function ProductPage() {
                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                    </span>
                  </summary>
-                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
+                 <div className="text-secondary opacity-60 mt-4 text-sm leading-relaxed whitespace-pre-wrap">
                    <p>{product.description}</p>
                  </div>
                </details>
@@ -232,8 +232,8 @@ export default function ProductPage() {
                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                    </span>
                  </summary>
-                 <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
-                   Ditenun menggunakan 100% benang sutra asli pilihan dengan teknik tradisional Sengkang. Kain ini memiliki kilau alami dan tekstur yang lembut serta nyaman di kulit.
+                 <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed whitespace-pre-wrap">
+                   {product.material || "Ditenun menggunakan 100% benang sutra asli pilihan dengan teknik tradisional Sengkang. Kain ini memiliki kilau alami dan tekstur yang lembut serta nyaman di kulit."}
                  </p>
                </details>
 
@@ -245,8 +245,8 @@ export default function ProductPage() {
                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                    </span>
                  </summary>
-                 <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed">
-                   Keringkan di tempat teduh. Cuci kering (dry clean) sangat disarankan untuk menjaga keawetan warna dan kilau sutra. Jangan gunakan pemutih atau pelembut pakaian kimia. Setrika dengan suhu rendah atau gunakan pelapis.
+                 <p className="text-secondary opacity-60 mt-4 text-sm leading-relaxed whitespace-pre-wrap">
+                   {product.careInstructions || "Keringkan di tempat teduh. Cuci kering (dry clean) sangat disarankan untuk menjaga keawetan warna dan kilau sutra. Jangan gunakan pemutih atau pelembut pakaian kimia. Setrika dengan suhu rendah atau gunakan pelapis."}
                  </p>
                </details>
 

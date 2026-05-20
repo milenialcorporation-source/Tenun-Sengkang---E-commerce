@@ -10,7 +10,7 @@ function CheckoutContent() {
   const [email, setEmail] = useState('');
   const [isAuth, setIsAuth] = useState(false);
   const searchParams = useSearchParams();
-  const productId = searchParams.get('productId');
+  const productId = searchParams?.get('productId');
   const { state } = useStore();
 
   React.useEffect(() => {

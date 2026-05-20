@@ -31,16 +31,24 @@ Instrumen ini bertujuan untuk menilai kinerja dan fungsionalitas dari Sistem Inf
 | <td colspan="5">**PENGUNJUNG / PELANGGAN**</td> |
 | 1 | Halaman Utama & Katalog | Menampilkan daftar produk dan kategori produk dengan benar | | |
 | | Halaman Utama & Katalog | Banner utama dan daftar koleksi dapat di-scroll/diklik | | |
+| 1.1 | Fitur Pencarian (Search) | Dapat mencari produk berdasarkan kata kunci dan menekan enter (atau tombol search) | | |
 | 2 | Halaman Detail Produk | Menampilkan gambar produk, nama, harga, dan deskripsi detail | | |
 | | Halaman Detail Produk | Tombol "Beli Sekarang" mengarahkan user ke form checkout | | |
+| | Halaman Detail Produk | Tombol "Add to Cart" menambahkan produk ke keranjang belanja | | |
 | | Halaman Detail Produk  | Menklik tombol "Wishlist" (♡) mengarahkan user ke halaman login jika belum login | | |
+| 2.1 | Fitur Keranjang Belanja | Menampilkan produk yang ditambahkan ke keranjang | | |
+| | Fitur Keranjang Belanja | Kuantitas produk dalam keranjang dapat ditambah/dikurang dan subtotal terupdate | | |
 | 3 | Halaman Login & Registrasi | Menampilkan form untuk mengisi email dan password | | |
 | | Halaman Login & Registrasi | Validasi tidak dapat login jika form masih kosong | | |
 | | Halaman Login & Registrasi | Berhasil masuk ke halaman utama setelah login | | |
 | 4 | Fitur Wishlist (Pelanggan) | Ikon wishlist (♡) berubah warna saat produk ditambahkan setelah login | | |
 | | Fitur Wishlist (Pelanggan) | Produk dihapus dari wishlist jika ikon wishlist diklik ulang | | |
+| | Fitur Wishlist (Pelanggan) | Daftar produk yang di-wishlist tersimpan dan tampil di Halaman Akun | | |
+| 4.1 | Halaman Akun (Account) | Menampilkan informasi profil, pesanan (orders), dan wishlist pengguna | | |
 | 5 | Halaman Checkout | Menampilkan form untuk isi data informasi pengiriman | | |
 | | Halaman Checkout | Menampilkan ringkasan produk yang dibeli dan total harga | | |
+| | Halaman Checkout | Mendukung fungsi Fast Checkout (Guest Checkout) untuk pengguna tanpa akun | | |
+| | Halaman Checkout | Menampilkan pilihan integrasi pembayaran (contoh: Xendit) dan pengiriman (KiriminAja) | | |
 | | Halaman Checkout | Validasi form wajib diisi sebelum pesanan diselesaikan (Tombol Bayar) | | |
 | <td colspan="5">**ADMIN**</td> |
 | 6 | Halaman Login Admin | Menampilkan form kredensial khusus login admin | | |

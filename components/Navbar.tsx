@@ -43,7 +43,7 @@ export default function Navbar() {
     };
   }, [isSearchOpen]);
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/manage-store-secret')) {
     return null;
   }
 
