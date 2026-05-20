@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { ImageInput, HeroSlide, Collection, Product } from '@/lib/types';
 import Image from 'next/image';
-import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw } from 'lucide-react';
+import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw, Menu, X } from 'lucide-react';
 
 const handleImageUpload = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [pinEntry, setPinEntry] = useState('');
   const [isPinCorrect, setIsPinCorrect] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const hasChanges = JSON.stringify(state) !== JSON.stringify(savedState);
 
@@ -96,25 +97,48 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="font-serif text-xl">Admin Panel</h2>
-          <p className="text-xs text-gray-500 mt-1">Kain Sutra Sengkang</p>
+    <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden absolute inset-0 w-full">
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 flex-shrink-0 relative z-20">
+        <div>
+          <h2 className="font-serif text-lg">Admin Panel</h2>
         </div>
-        <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
-          <TabButton active={activeTab === 'logo'} onClick={() => setActiveTab('logo')} icon={<ImageIcon size={18} />} label="Logo Manager" />
-          <TabButton active={activeTab === 'hero'} onClick={() => setActiveTab('hero')} icon={<Layout size={18} />} label="Homepage Slides" />
-          <TabButton active={activeTab === 'featuredSections'} onClick={() => setActiveTab('featuredSections')} icon={<Layout size={18} />} label="Featured Sections" />
-          <TabButton active={activeTab === 'megaMenu'} onClick={() => setActiveTab('megaMenu')} icon={<Layout size={18} />} label="Mega Menu Cards" />
-          <TabButton active={activeTab === 'hamburgerMenu'} onClick={() => setActiveTab('hamburgerMenu')} icon={<Layout size={18} />} label="Hamburger Menu" />
-          <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<ImageIcon size={18} />} label="About Page Settings" />
-          <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={<FolderPlus size={18} />} label="Collections/Category" />
-          <TabButton active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Box size={18} />} label="Products" />
-          <TabButton active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} icon={<ToggleLeft size={18} />} label="Catalog Control" />
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 bg-gray-100 rounded text-gray-600 hover:text-gray-900 transition-colors">
+           <Menu size={20} />
+        </button>
+      </div>
+
+      {/* Sidebar Overlay (Mobile) */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed md:static inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 z-40 w-72 md:w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out h-full shadow-2xl md:shadow-none`}>
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white relative z-10">
+          <div>
+            <h2 className="font-serif text-xl">Admin Panel</h2>
+            <p className="text-xs text-gray-500 mt-1">Kain Sutra Sengkang</p>
+          </div>
+          <button className="md:hidden text-gray-500 hover:text-gray-700 p-2" onClick={() => setIsMobileMenuOpen(false)}>
+             <X size={20} />
+          </button>
+        </div>
+        <nav className="p-4 space-y-2 flex-1 overflow-y-auto w-full relative z-10 bg-white">
+          <TabButton active={activeTab === 'logo'} onClick={() => { setActiveTab('logo'); setIsMobileMenuOpen(false); }} icon={<ImageIcon size={18} />} label="Logo Manager" />
+          <TabButton active={activeTab === 'hero'} onClick={() => { setActiveTab('hero'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Homepage Slides" />
+          <TabButton active={activeTab === 'featuredSections'} onClick={() => { setActiveTab('featuredSections'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Featured Sections" />
+          <TabButton active={activeTab === 'megaMenu'} onClick={() => { setActiveTab('megaMenu'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Mega Menu Cards" />
+          <TabButton active={activeTab === 'hamburgerMenu'} onClick={() => { setActiveTab('hamburgerMenu'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Hamburger Menu" />
+          <TabButton active={activeTab === 'profile'} onClick={() => { setActiveTab('profile'); setIsMobileMenuOpen(false); }} icon={<ImageIcon size={18} />} label="About Page Settings" />
+          <TabButton active={activeTab === 'collections'} onClick={() => { setActiveTab('collections'); setIsMobileMenuOpen(false); }} icon={<FolderPlus size={18} />} label="Collections/Category" />
+          <TabButton active={activeTab === 'products'} onClick={() => { setActiveTab('products'); setIsMobileMenuOpen(false); }} icon={<Box size={18} />} label="Products" />
+          <TabButton active={activeTab === 'catalog'} onClick={() => { setActiveTab('catalog'); setIsMobileMenuOpen(false); }} icon={<ToggleLeft size={18} />} label="Catalog Control" />
         </nav>
-        <div className="p-4 border-t border-gray-200 space-y-2 flex-shrink-0">
+        <div className="p-4 border-t border-gray-200 space-y-2 flex-shrink-0 bg-white relative z-10">
           {hasChanges && (
             <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-4 space-y-2">
                <p className="text-xs text-amber-800 font-medium">Unsaved changes!</p>
@@ -136,8 +160,24 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <main className="flex-1 p-4 md:p-12 overflow-y-auto relative w-full">
+        {/* Mobile quick save widget when there are changes */}
+        <div className="md:hidden mb-6">
+           {hasChanges && (
+             <div className="bg-amber-50 p-3 rounded-md border border-amber-200 flex items-center gap-3 shadow-sm">
+                <div className="flex-1 flex gap-2 w-full">
+                  <button onClick={handleSave} disabled={isSaving} className="flex-1 flex items-center justify-center gap-2 bg-amber-500 text-white py-2.5 rounded text-sm font-semibold hover:bg-amber-600 transition-colors">
+                     <Save size={16} /> Save
+                  </button>
+                  <button onClick={discardChanges} disabled={isSaving} className="px-4 flex items-center justify-center gap-2 bg-white border border-amber-300 text-amber-800 py-2.5 rounded text-sm font-semibold hover:bg-amber-100 transition-colors">
+                     <RotateCcw size={16} />
+                  </button>
+                </div>
+             </div>
+           )}
+        </div>
+
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-8 w-full">
           {activeTab === 'logo' && <LogoManager state={state} setState={setState} />}
           {activeTab === 'hero' && <HeroManager state={state} setState={setState} />}
           {activeTab === 'featuredSections' && <FeaturedSectionManager state={state} setState={setState} />}
