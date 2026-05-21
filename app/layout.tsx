@@ -4,6 +4,7 @@ import './globals.css';
 import { StoreProvider } from '@/lib/store';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { query, initializeDatabase } from '@/lib/db';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     siteName: 'Kain Sutra Sengkang',
     images: [
       {
-        url: 'https://picsum.photos/1200/630', // We can use a reliable placeholder or the app's actual representative image
+        url: 'https://picsum.photos/1200/630',
         width: 1200,
         height: 630,
         alt: 'Kain Sutra Sengkang',
@@ -37,11 +38,31 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+let dbInitialized = false;
+
+// We use dynamic rendering to ensure fresh data, but cache could be tweaked.
+export const dynamic = 'force-dynamic';
+
+export default async function RootLayout({children}: {children: React.ReactNode}) {
+  let initialServerState = null;
+  
+  try {
+    if (!dbInitialized) {
+      await initializeDatabase();
+      dbInitialized = true;
+    }
+    const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
+    if (rows && rows.length > 0) {
+      initialServerState = JSON.parse(rows[0].data);
+    }
+  } catch (error) {
+    console.error('Error fetching initial server state:', error);
+  }
+
   return (
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
       <body suppressHydrationWarning className="antialiased min-h-screen flex flex-col">
-        <StoreProvider>
+        <StoreProvider initialServerState={initialServerState}>
           <Navbar />
           <main className="flex-1">
             {children}

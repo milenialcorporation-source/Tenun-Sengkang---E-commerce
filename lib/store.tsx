@@ -31,12 +31,34 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'kainsutra_state_v1';
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [state, setLocalState] = useState<StoreState>(defaultState);
-  const [savedState, setSavedState] = useState<StoreState>(defaultState);
-  const [isLoaded, setIsLoaded] = useState(false);
+export function StoreProvider({ children, initialServerState }: { children: React.ReactNode, initialServerState?: StoreState | null }) {
+  const initialStateToUse = initialServerState ? { ...defaultState, ...initialServerState } : defaultState;
+  
+  // ensure arrays
+  initialStateToUse.heroSlides = Array.isArray(initialStateToUse.heroSlides) ? initialStateToUse.heroSlides : [];
+  initialStateToUse.collections = Array.isArray(initialStateToUse.collections) ? initialStateToUse.collections : [];
+  initialStateToUse.products = Array.isArray(initialStateToUse.products) ? initialStateToUse.products : [];
+  initialStateToUse.featuredSections = Array.isArray(initialStateToUse.featuredSections) ? initialStateToUse.featuredSections : [];
+  initialStateToUse.megaMenuCards = Array.isArray(initialStateToUse.megaMenuCards) ? initialStateToUse.megaMenuCards : [];
+  initialStateToUse.hamburgerProducts = Array.isArray(initialStateToUse.hamburgerProducts) ? initialStateToUse.hamburgerProducts : [];
+  initialStateToUse.hamburgerCollections = Array.isArray(initialStateToUse.hamburgerCollections) ? initialStateToUse.hamburgerCollections : [];
+  initialStateToUse.storyImages = Array.isArray(initialStateToUse.storyImages) ? initialStateToUse.storyImages : [];
+  initialStateToUse.profileSlides = Array.isArray(initialStateToUse.profileSlides) ? initialStateToUse.profileSlides : [];
+
+  const [state, setLocalState] = useState<StoreState>(initialStateToUse);
+  const [savedState, setSavedState] = useState<StoreState>(initialStateToUse);
+  // If we have initialServerState, we consider it loaded immediately.
+  const [isLoaded, setIsLoaded] = useState(!!initialServerState);
 
   useEffect(() => {
+    if (initialServerState) {
+      // If we got state from server, optionally sync local storage
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialServerState));
+      } catch(e) {}
+      return; // Skip client side fetching if server provided it
+    }
+
     const loadState = async () => {
       try {
         // Try fetching from MySQL via our API route
