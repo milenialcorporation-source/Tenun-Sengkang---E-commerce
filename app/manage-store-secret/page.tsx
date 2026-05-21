@@ -553,6 +553,12 @@ function CollectionManager({ state, setState }: any) {
 
 
 function ProductManager({ state, setState }: any) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [sortBy, setSortBy] = useState('newest');
+
+  const categories = ['All', ...Array.from(new Set((state.products || []).map((p: Product) => p.category).filter(Boolean)))];
+
   const addProd = () => {
      const newP: Product = { id: Math.random().toString(), name: 'New Product', price: 0, description: '', category: 'General', isManual: true };
      setState((s: any) => ({ ...s, products: [newP, ...s.products] }));
@@ -588,19 +594,71 @@ function ProductManager({ state, setState }: any) {
 
    const deleteProd = (id: string) => setState((s: any) => ({ ...s, products: s.products.filter((c: Product) => c.id !== id) }));
 
+   let processedProducts = [...(state.products || [])].filter((prod: Product) => {
+     const matchesSearch = prod.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (prod.category && prod.category.toLowerCase().includes(searchTerm.toLowerCase()));
+     const matchesCategory = filterCategory === 'All' || prod.category === filterCategory;
+     return matchesSearch && matchesCategory;
+   });
+
+   if (sortBy === 'name-asc') {
+     processedProducts.sort((a: Product, b: Product) => a.name.localeCompare(b.name));
+   } else if (sortBy === 'price-asc') {
+     processedProducts.sort((a: Product, b: Product) => (a.price || 0) - (b.price || 0));
+   } else if (sortBy === 'price-desc') {
+     processedProducts.sort((a: Product, b: Product) => (b.price || 0) - (a.price || 0));
+   }
+
    return (
      <div className="space-y-8">
-       <div className="flex justify-between items-center mb-6">
+       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
           <div>
             <h3 className="text-lg font-semibold">Products</h3>
             <p className="text-xs text-gray-500">Manage manual products.</p>
             <p className="text-xs text-primary font-medium mt-1">Recommended ratio: 4:5 or 3:4 portrait (e.g., 800x1000px).</p>
           </div>
-          <button onClick={addProd} className="bg-primary text-secondary px-4 py-2 rounded font-medium text-sm">Add Product</button>
+          <div className="flex flex-col gap-3 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row gap-3">
+              <input 
+                type="text" 
+                placeholder="Search products..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary w-full md:w-64"
+              />
+              <button onClick={addProd} className="bg-primary text-secondary px-4 py-2 rounded font-medium text-sm flex-shrink-0 whitespace-nowrap">Add Product</button>
+            </div>
+            <div className="flex gap-3">
+              <select 
+                value={filterCategory} 
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary w-full md:w-auto bg-white flex-1"
+              >
+                {categories.map((cat: any) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary w-full md:w-auto bg-white flex-1"
+              >
+                <option value="newest">Newest</option>
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="price-asc">Price (Low to High)</option>
+                <option value="price-desc">Price (High to Low)</option>
+              </select>
+            </div>
+          </div>
        </div>
        <div className="space-y-4">
-         {(state.products || []).map((prod: Product) => (
-           <div key={prod.id} className="flex flex-col md:flex-row border border-gray-200 rounded p-4 relative gap-6">
+         {processedProducts.length === 0 ? (
+           <div className="text-center py-8 text-gray-500 text-sm bg-gray-50 rounded border border-gray-100">
+             No products found matching your filters.
+           </div>
+         ) : null}
+         {processedProducts.map((prod: Product) => (
+           <div key={prod.id} className="flex flex-col md:flex-row border border-gray-200 rounded p-4 relative gap-6 hover:border-gray-300 transition-colors bg-white">
                <div className="w-24 h-32 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
                   {prod.image && <img src={prod.image.data} className="w-full h-full object-cover" alt="Preview"/>}
                </div>
