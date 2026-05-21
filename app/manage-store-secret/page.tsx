@@ -557,7 +557,10 @@ function ProductManager({ state, setState }: any) {
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
 
-  const categories = ['All', ...Array.from(new Set((state.products || []).map((p: Product) => p.category).filter(Boolean)))];
+  const categories = ['All', ...Array.from(new Set([
+    ...(state.collections || []).map((c: any) => c.name),
+    ...(state.products || []).map((p: Product) => p.category)
+  ].filter(Boolean)))];
 
   const addProd = () => {
      const newP: Product = { id: Math.random().toString(), name: 'New Product', price: 0, description: '', category: 'General', isManual: true };
