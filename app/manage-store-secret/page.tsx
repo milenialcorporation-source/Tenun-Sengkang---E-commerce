@@ -685,6 +685,13 @@ function ProductManager({ state, setState }: any) {
                     </select>
                   </div>
                   <div>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Jenis Pembelian</label>
+                    <select value={prod.productType || 'jadi'} onChange={e => updateProd(prod.id, 'productType', e.target.value)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary bg-white">
+                      <option value="jadi">Produk Jadi (Satuan)</option>
+                      <option value="kain">Kain (Meter / Desimal)</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="text-[10px] uppercase font-semibold text-gray-400">Unit of Measure (UOM)</label>
                     <select value={prod.uom || ''} onChange={e => updateProd(prod.id, 'uom', e.target.value)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary bg-white">
                       <option value="">-- Default (Per Pcs) --</option>

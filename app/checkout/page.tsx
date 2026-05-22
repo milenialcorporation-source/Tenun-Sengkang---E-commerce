@@ -11,6 +11,7 @@ function CheckoutContent() {
   const [isAuth, setIsAuth] = useState(false);
   const searchParams = useSearchParams();
   const productId = searchParams?.get('productId');
+  const qtyParam = searchParams?.get('qty');
   const { state } = useStore();
 
   React.useEffect(() => {
@@ -24,10 +25,11 @@ function CheckoutContent() {
   }, []);
 
   const product = (state.products || []).find(p => p.id === productId);
+  const qtyNum = qtyParam ? parseFloat(qtyParam) : 1;
 
   // Fallback to a default if no product is selected (for direct visits)
-  const itemName = product ? `${product.name} (1x)` : 'Produk (1x)';
-  const itemPrice = product ? Number(product.price || 0) : 1500000;
+  const itemName = product ? `${product.name} (${qtyNum}${product.productType === 'kain' ? 'm' : 'x'})` : 'Produk (1x)';
+  const itemPrice = product ? Number(product.price || 0) * qtyNum : 1500000;
   
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-24">

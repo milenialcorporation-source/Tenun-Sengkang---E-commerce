@@ -15,6 +15,7 @@ export default function ProductPage() {
   const product = (state.products || []).find(p => p.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [wishlist, setWishlist] = React.useState<string[]>([]);
+  const [kainLength, setKainLength] = React.useState('1');
 
   React.useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true') {
@@ -118,12 +119,31 @@ export default function ProductPage() {
                {product.category}
              </Link>
              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl mb-4">{product.name}</h1>
-             <p className="text-2xl opacity-80 mb-8">
+             <p className="text-2xl opacity-80 mb-2">
                Rp {Number(product.price || 0).toLocaleString('id-ID')}
                <span className="text-sm border ml-2 border-gray-200 px-2 py-1 rounded text-gray-500 font-sans tracking-wide">
-                 {product.uom || 'Per Pcs'}
+                 {product.uom || (product.productType === 'kain' ? 'Per Meter' : 'Per Pcs')}
                </span>
              </p>
+             {product.productType === 'kain' && (
+               <div className="mb-8">
+                 <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">Panjang Pesanan (Meter)</label>
+                 <div className="flex items-center gap-4">
+                   <input 
+                     type="number" 
+                     min="0.1" 
+                     step="0.01" 
+                     value={kainLength} 
+                     onChange={(e) => setKainLength(e.target.value)}
+                     className="w-24 border border-gray-300 rounded px-3 py-2 text-center focus:outline-none focus:border-primary"
+                   />
+                   <p className="text-sm font-semibold">
+                     Total: Rp {(Number(product.price || 0) * (parseFloat(kainLength) || 0)).toLocaleString('id-ID')}
+                   </p>
+                 </div>
+               </div>
+             )}
+             {product.productType !== 'kain' && <div className="mb-8"></div>}
              
              <div className="prose prose-sm opacity-70 mb-12 whitespace-pre-wrap">
                <p>{product.description}</p>
@@ -135,11 +155,21 @@ export default function ProductPage() {
                    if (typeof window !== 'undefined') {
                      const existingCartStr = localStorage.getItem('cart');
                      let cart = existingCartStr ? JSON.parse(existingCartStr) : [];
-                     const itemIndex = cart.findIndex((item: any) => item.id === product.id);
+                     
+                     let qty = 1;
+                     if (product.productType === 'kain') {
+                       qty = parseFloat(kainLength);
+                       if (isNaN(qty) || qty <= 0) {
+                         alert('Masukkan panjang pesanan yang valid.');
+                         return;
+                       }
+                     }
+
+                     const itemIndex = cart.findIndex((item: any) => item.id === product.id && item.isKain === (product.productType === 'kain'));
                      if (itemIndex > -1) {
-                       cart[itemIndex].quantity += 1;
+                       cart[itemIndex].quantity += qty;
                      } else {
-                       cart.push({ ...product, quantity: 1 });
+                       cart.push({ ...product, quantity: qty, isKain: product.productType === 'kain' });
                      }
                      localStorage.setItem('cart', JSON.stringify(cart));
                      alert('Produk ditambahkan ke keranjang!');
@@ -147,9 +177,19 @@ export default function ProductPage() {
                  }} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
                    Add to Cart
                  </button>
-                 <Link href={`/checkout?productId=${product.id}`} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
+                 <button onClick={() => {
+                   let qty = 1;
+                   if (product.productType === 'kain') {
+                     qty = parseFloat(kainLength);
+                     if (isNaN(qty) || qty <= 0) {
+                       alert('Masukkan panjang pesanan yang valid.');
+                       return;
+                     }
+                   }
+                   router.push(`/checkout?productId=${product.id}&qty=${qty}`);
+                 }} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
                    Beli Sekarang
-                 </Link>
+                 </button>
                  <button onClick={(e) => toggleWishlist(e, product.id)} className={`px-5 border border-gray-200 transition-colors flex items-center justify-center ${wishlist.includes(product.id) ? 'text-red-500 border-red-200' : 'hover:border-black text-gray-600'}`}>
                    <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -174,6 +214,15 @@ export default function ProductPage() {
                    </div>
                  </div>
                )}
+
+               <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
+                 <a href={`https://wa.me/6281234567890?text=${encodeURIComponent(`Halo, saya tertarik dengan produk ${product.name}.`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-4 bg-[#25D366] text-white text-sm font-semibold uppercase tracking-widest hover:bg-[#1ebd5b] transition-colors rounded">
+                   Pesan via WhatsApp
+                 </a>
+                 <Link href="/locations" className="flex items-center justify-center w-full py-4 border border-black text-black text-sm font-semibold uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded">
+                   Kunjungi Toko Offline
+                 </Link>
+               </div>
 
                <p className="text-xs text-center opacity-50 pt-2">Pengiriman gratis untuk pesanan di atas Rp 2.000.000</p>
              </div>

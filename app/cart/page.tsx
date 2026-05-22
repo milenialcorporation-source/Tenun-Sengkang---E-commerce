@@ -17,7 +17,7 @@ export default function CartPage() {
   }, []);
 
   const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity <= 0) return;
     const updatedCart = cartItems.map(item => 
       item.id === id ? { ...item, quantity: newQuantity } : item
     );
@@ -56,11 +56,28 @@ export default function CartPage() {
                       
                       <div className="flex items-center gap-4">
                         <div className="flex items-center border border-gray-200">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-100">-</button>
-                          <span className="px-3 py-1 text-sm">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-100">+</button>
+                          {item.isKain ? (
+                           <input 
+                              type="number" 
+                              min="0.1" 
+                              step="0.01" 
+                              value={item.quantity} 
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                if (!isNaN(val) && val > 0) updateQuantity(item.id, val);
+                              }}
+                              className="w-20 px-3 py-1 text-sm text-center focus:outline-none"
+                            />
+                          ) : (
+                           <>
+                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-100">-</button>
+                            <span className="px-3 py-1 text-sm">{item.quantity}</span>
+                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-100">+</button>
+                           </>
+                          )}
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="text-xs uppercase tracking-widest text-red-500 hover:text-red-700 underline">Hapus</button>
+                        {item.isKain && <span className="text-xs uppercase tracking-widest font-semibold text-gray-500">Meter</span>}
+                        <button onClick={() => removeItem(item.id)} className="text-xs uppercase tracking-widest text-red-500 hover:text-red-700 underline ml-auto">Hapus</button>
                       </div>
                     </div>
                   </div>

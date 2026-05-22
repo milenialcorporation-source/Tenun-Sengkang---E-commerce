@@ -26,6 +26,7 @@ export type Product = {
   description: string;
   category: string;
   uom?: string; // Unit of Measure (e.g., "Per Pcs", "Per Meter")
+  productType?: 'jadi' | 'kain'; // 'jadi' for fixed quantity, 'kain' for length
   image?: ImageInput;
   images?: ImageInput[];
   isManual: boolean;
