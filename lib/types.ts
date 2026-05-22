@@ -61,6 +61,8 @@ export type StoryImage = {
 
 export type StoreState = {
   logo?: ImageInput;
+  whatsappNumber?: string;
+  offlineStoreLink?: string;
   heroSlides: HeroSlide[];
   collections: Collection[];
   products: Product[];

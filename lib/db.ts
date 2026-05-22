@@ -41,9 +41,13 @@ export async function query(sql: string, values?: any[]) {
   return results;
 }
 
+let isInitialized = false;
+
 export async function initializeDatabase() {
+  if (isInitialized) return;
   if (!pool) {
     console.log('MySQL not configured, using in-memory fallback.');
+    isInitialized = true;
     return;
   }
   try {
@@ -91,6 +95,7 @@ export async function initializeDatabase() {
       await query("INSERT INTO store_state (data) VALUES (?)", ['{}']);
     }
     console.log("MySQL Database initialized successfully.");
+    isInitialized = true;
   } catch (error) {
     console.error("Error initializing MySQL Database:", error);
   }

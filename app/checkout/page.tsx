@@ -17,6 +17,7 @@ function CheckoutContent() {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuth(loggedIn);
       if (loggedIn) {
         setEmail(localStorage.getItem('userEmail') || '');

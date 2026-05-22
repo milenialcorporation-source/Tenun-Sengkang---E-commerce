@@ -216,12 +216,16 @@ export default function ProductPage() {
                )}
 
                <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
-                 <a href={`https://wa.me/6281234567890?text=${encodeURIComponent(`Halo, saya tertarik dengan produk ${product.name}.`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-4 bg-[#25D366] text-white text-sm font-semibold uppercase tracking-widest hover:bg-[#1ebd5b] transition-colors rounded">
-                   Pesan via WhatsApp
-                 </a>
-                 <Link href="/locations" className="flex items-center justify-center w-full py-4 border border-black text-black text-sm font-semibold uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded">
-                   Kunjungi Toko Offline
-                 </Link>
+                 {state.whatsappNumber && (
+                   <a href={state.whatsappNumber.startsWith('http') ? state.whatsappNumber : `https://wa.me/${state.whatsappNumber.replace(/\D/g,'')}?text=${encodeURIComponent(`Halo, saya tertarik dengan produk ${product.name}.`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full py-4 bg-[#25D366] text-white text-sm font-semibold uppercase tracking-widest hover:bg-[#1ebd5b] transition-colors rounded">
+                     Pesan via WhatsApp
+                   </a>
+                 )}
+                 {(state.offlineStoreLink || '/locations') && (
+                   <Link href={state.offlineStoreLink || '/locations'} className="flex items-center justify-center w-full py-4 border border-black text-black text-sm font-semibold uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded">
+                     Kunjungi Toko Offline
+                   </Link>
+                 )}
                </div>
 
                <p className="text-xs text-center opacity-50 pt-2">Pengiriman gratis untuk pesanan di atas Rp 2.000.000</p>

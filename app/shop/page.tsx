@@ -15,9 +15,12 @@ function ShopContent() {
   const [searchQuery, setSearchQuery] = useState<string | null>(initialQuery || null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery(searchParams?.get('q') || null);
     const categoryFromQuery = searchParams?.get('category');
-    if (categoryFromQuery) setSelectedCategory(categoryFromQuery);
+    if (categoryFromQuery) {
+       setSelectedCategory(categoryFromQuery);
+    }
   }, [searchParams]);
 
   // Derive categories from products + collections

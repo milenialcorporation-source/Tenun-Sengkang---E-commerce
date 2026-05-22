@@ -11,6 +11,7 @@ export default function CartPage() {
     if (typeof window !== 'undefined') {
       const storedCartStr = localStorage.getItem('cart');
       if (storedCartStr) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCartItems(JSON.parse(storedCartStr));
       }
     }

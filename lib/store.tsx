@@ -13,6 +13,8 @@ const defaultState: StoreState = {
   megaMenuCards: [],
   hamburgerProducts: [],
   hamburgerCollections: [],
+  whatsappNumber: '6281234567890',
+  offlineStoreLink: '/locations',
   storyTitle: 'Profil Kami',
   storyDescription: 'Terletak di jantung Sulawesi Selatan, Sengkang telah lama dikenal sebagai kota sutra. Sejak tahun 1990, Kain Sutra Sengkang telah berkomitmen untuk melestarikan tradisi luhur ini melalui keahlian dan dedikasi.\n\nKami bekerja berdampingan dengan para pengrajin lokal, memastikan setiap helai benang ditenun dengan presisi dan cinta, menghasilkan karya seni yang tak lekang oleh waktu dan menghargai nilai sejarah. Misi kami adalah menghadirkan kemewahan sutra Sengkang ke seluruh penjuru negeri, menggabungkan desain klasik dengan sentuhan modern.',
   storyImages: [],
@@ -116,7 +118,7 @@ export function StoreProvider({ children, initialServerState }: { children: Reac
     };
 
     loadState();
-  }, []);
+  }, [initialServerState]);
 
   const saveToDb = async () => {
     try {

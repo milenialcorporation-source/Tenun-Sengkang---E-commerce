@@ -15,7 +15,7 @@ const handleImageUpload = (file: File): Promise<string> => {
   });
 };
 
-type Tab = 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' | 'profile' | 'collections' | 'products' | 'catalog';
+type Tab = 'general' | 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' | 'profile' | 'collections' | 'products' | 'catalog';
 
 export default function AdminDashboard() {
   const { state, savedState, setState, saveToDb, discardChanges } = useStore();
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     // Only show auth prompt if user knows the exact secret key via hash
     if (window.location.hash === '#authorized-admin-access') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowAuth(true);
     }
   }, []);
@@ -128,6 +129,7 @@ export default function AdminDashboard() {
           </button>
         </div>
         <nav className="p-4 space-y-2 flex-1 overflow-y-auto w-full relative z-10 bg-white">
+          <TabButton active={activeTab === 'general'} onClick={() => { setActiveTab('general'); setIsMobileMenuOpen(false); }} icon={<Settings size={18} />} label="General Settings" />
           <TabButton active={activeTab === 'logo'} onClick={() => { setActiveTab('logo'); setIsMobileMenuOpen(false); }} icon={<ImageIcon size={18} />} label="Logo Manager" />
           <TabButton active={activeTab === 'hero'} onClick={() => { setActiveTab('hero'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Homepage Slides" />
           <TabButton active={activeTab === 'featuredSections'} onClick={() => { setActiveTab('featuredSections'); setIsMobileMenuOpen(false); }} icon={<Layout size={18} />} label="Featured Sections" />
@@ -178,6 +180,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-8 w-full">
+          {activeTab === 'general' && <GeneralSettingsManager state={state} setState={setState} />}
           {activeTab === 'logo' && <LogoManager state={state} setState={setState} />}
           {activeTab === 'hero' && <HeroManager state={state} setState={setState} />}
           {activeTab === 'featuredSections' && <FeaturedSectionManager state={state} setState={setState} />}
@@ -205,6 +208,47 @@ function TabButton({ active, onClick, icon, label }: { active: boolean, onClick:
 }
 
 // Subcomponents for each tab
+function GeneralSettingsManager({ state, setState }: any) {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-lg font-semibold mb-1">General Settings</h3>
+        <p className="text-sm text-gray-500 mb-6">Manage global store links and contacts.</p>
+      </div>
+
+      <div className="space-y-6 max-w-xl">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold">WhatsApp Link/Number</label>
+          <div className="text-xs text-gray-500 mb-2">
+            Example: <code className="bg-gray-100 px-1 py-0.5 rounded">6281234567890</code> or a full URL like <code className="bg-gray-100 px-1 py-0.5 rounded">https://wa.me/6281234567890</code>
+          </div>
+          <input 
+            type="text" 
+            value={state.whatsappNumber || ''} 
+            onChange={(e) => setState((s: any) => ({ ...s, whatsappNumber: e.target.value }))}
+            placeholder="e.g., 6281234567890"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold">Offline Store Link</label>
+          <div className="text-xs text-gray-500 mb-2">
+            Link to your offline store locator, maps link, or /locations page.
+          </div>
+          <input 
+            type="text" 
+            value={state.offlineStoreLink || ''} 
+            onChange={(e) => setState((s: any) => ({ ...s, offlineStoreLink: e.target.value }))}
+            placeholder="e.g., /locations or https://maps.google.com/..."
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LogoManager({ state, setState }: any) {
   const [url, setUrl] = useState('');
   

@@ -38,8 +38,6 @@ export const metadata: Metadata = {
   },
 };
 
-let dbInitialized = false;
-
 // We use dynamic rendering to ensure fresh data, but cache could be tweaked.
 export const dynamic = 'force-dynamic';
 
@@ -47,10 +45,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
   let initialServerState = null;
   
   try {
-    if (!dbInitialized) {
-      await initializeDatabase();
-      dbInitialized = true;
-    }
+    await initializeDatabase();
     const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
     if (rows && rows.length > 0) {
       initialServerState = JSON.parse(rows[0].data);
