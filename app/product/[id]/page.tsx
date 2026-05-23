@@ -94,7 +94,7 @@ export default function ProductPage() {
                  src={Array.isArray(product.images) && product.images.length > 0 && selectedImageIndex > 0 ? (product.images[selectedImageIndex - 1].data || 'https://picsum.photos/800/1000') : (product.image?.data || 'https://picsum.photos/800/1000')}
                  alt={product.name}
                  fill
-                 className="object-cover"
+                 className="object-contain"
                  referrerPolicy="no-referrer"
                  priority
                />
@@ -102,11 +102,11 @@ export default function ProductPage() {
              {(Array.isArray(product.images) && product.images.length > 0) && (
                <div className="flex gap-4 overflow-x-auto pb-2 snap-x">
                  <button onClick={() => setSelectedImageIndex(0)} className={`relative w-20 aspect-square flex-shrink-0 snap-start border-2 ${selectedImageIndex === 0 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
-                   <Image src={product.image?.data || 'https://picsum.photos/800/1000'} fill alt="Main" className="object-cover" />
+                   <Image src={product.image?.data || 'https://picsum.photos/800/1000'} fill alt="Main" className="object-contain" />
                  </button>
                  {product.images.map((img: any, idx: number) => (
                    <button key={idx} onClick={() => setSelectedImageIndex(idx + 1)} className={`relative w-20 aspect-square flex-shrink-0 snap-start border-2 ${selectedImageIndex === idx + 1 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
-                     <Image src={img.data || 'https://picsum.photos/800/1000'} fill alt={`Variant ${idx + 1}`} className="object-cover" />
+                     <Image src={img.data || 'https://picsum.photos/800/1000'} fill alt={`Variant ${idx + 1}`} className="object-contain" />
                    </button>
                  ))}
                </div>

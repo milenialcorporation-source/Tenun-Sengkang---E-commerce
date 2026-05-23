@@ -128,7 +128,7 @@ function ShopContent() {
                     src={product.image?.data || 'https://picsum.photos/600/800'} 
                     alt={product.name} 
                     fill 
-                    className={`object-cover transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+                    className={`object-contain transition-opacity duration-500 ${(Array.isArray(product.images) && product.images.length > 0) ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
                     referrerPolicy="no-referrer"
                   />
                   {(Array.isArray(product.images) && product.images.length > 0) && (
@@ -136,7 +136,7 @@ function ShopContent() {
                       src={product.images[0].data || 'https://picsum.photos/600/800'}
                       alt={`${product.name} alternate`}
                       fill
-                      className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      className="object-contain absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                       referrerPolicy="no-referrer"
                     />
                   )}

@@ -111,7 +111,7 @@ export default function ProfilePage() {
                     src={selectedImage.image.data} 
                     alt={selectedImage.caption || "Image Detail"} 
                     fill 
-                    className="object-contain md:object-cover" 
+                    className="object-contain" 
                     referrerPolicy="no-referrer"
                   />
                 )}
