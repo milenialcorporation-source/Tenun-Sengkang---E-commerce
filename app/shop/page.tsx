@@ -118,7 +118,7 @@ function ShopContent() {
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 lg:gap-x-8 gap-y-8 lg:gap-y-12">
             {filteredProducts.map(product => (
               <Link href={`/product/${product.id}`} key={product.id} className="group block">
-                <div className="relative aspect-[3/4] mb-4 bg-gray-50 border border-gray-200 overflow-hidden">
+                <div className="relative aspect-square mb-4 bg-gray-50 border border-gray-200 overflow-hidden">
                   {product.isManual && (
                      <div className="absolute top-2 left-2 z-10 bg-black text-white text-[10px] px-2 py-1 uppercase tracking-wider">
                        Eksklusif

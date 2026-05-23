@@ -102,7 +102,7 @@ function FeaturedSectionView({ section, products = [], collections = [] }: { sec
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             {displayedProducts.map(product => (
               <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] flex-shrink-0 snap-start group flex flex-col min-w-0">
-                <div className="relative aspect-[4/5] mb-3 bg-gray-100 border border-gray-200 overflow-hidden w-full">
+                <div className="relative aspect-square mb-3 bg-gray-100 border border-gray-200 overflow-hidden w-full">
                   <Link href={`/product/${product.id}`} className="block w-full h-full relative">
                     <Image 
                       src={product.image?.data || 'https://picsum.photos/600/800'} 

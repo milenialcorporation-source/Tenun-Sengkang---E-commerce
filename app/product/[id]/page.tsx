@@ -89,7 +89,7 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
           {/* Image Gallery */}
           <div className="space-y-4">
-             <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden">
+             <div className="relative aspect-square bg-gray-50 overflow-hidden">
                <Image 
                  src={Array.isArray(product.images) && product.images.length > 0 && selectedImageIndex > 0 ? (product.images[selectedImageIndex - 1].data || 'https://picsum.photos/800/1000') : (product.image?.data || 'https://picsum.photos/800/1000')}
                  alt={product.name}
@@ -101,11 +101,11 @@ export default function ProductPage() {
              </div>
              {(Array.isArray(product.images) && product.images.length > 0) && (
                <div className="flex gap-4 overflow-x-auto pb-2 snap-x">
-                 <button onClick={() => setSelectedImageIndex(0)} className={`relative w-20 aspect-[3/4] flex-shrink-0 snap-start border-2 ${selectedImageIndex === 0 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
+                 <button onClick={() => setSelectedImageIndex(0)} className={`relative w-20 aspect-square flex-shrink-0 snap-start border-2 ${selectedImageIndex === 0 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
                    <Image src={product.image?.data || 'https://picsum.photos/800/1000'} fill alt="Main" className="object-cover" />
                  </button>
                  {product.images.map((img: any, idx: number) => (
-                   <button key={idx} onClick={() => setSelectedImageIndex(idx + 1)} className={`relative w-20 aspect-[3/4] flex-shrink-0 snap-start border-2 ${selectedImageIndex === idx + 1 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
+                   <button key={idx} onClick={() => setSelectedImageIndex(idx + 1)} className={`relative w-20 aspect-square flex-shrink-0 snap-start border-2 ${selectedImageIndex === idx + 1 ? 'border-primary' : 'border-transparent'} hover:border-gray-300 transition-colors`}>
                      <Image src={img.data || 'https://picsum.photos/800/1000'} fill alt={`Variant ${idx + 1}`} className="object-cover" />
                    </button>
                  ))}
@@ -222,9 +222,9 @@ export default function ProductPage() {
                    </a>
                  )}
                  {(state.offlineStoreLink || '/locations') && (
-                   <Link href={state.offlineStoreLink || '/locations'} className="flex items-center justify-center w-full py-4 border border-black text-black text-sm font-semibold uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded">
+                   <a href={state.offlineStoreLink || '/locations'} target={(state.offlineStoreLink || '').startsWith('http') ? "_blank" : "_self"} rel={(state.offlineStoreLink || '').startsWith('http') ? "noopener noreferrer" : ""} className="flex items-center justify-center w-full py-4 border border-black text-black text-sm font-semibold uppercase tracking-widest hover:bg-black hover:text-white transition-colors rounded">
                      Kunjungi Toko Offline
-                   </Link>
+                   </a>
                  )}
                </div>
 

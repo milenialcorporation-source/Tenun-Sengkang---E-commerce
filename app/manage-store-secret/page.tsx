@@ -232,15 +232,37 @@ function GeneralSettingsManager({ state, setState }: any) {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-semibold">Offline Store Link</label>
+          <label className="block text-sm font-semibold">Link Google Maps Toko Offline</label>
           <div className="text-xs text-gray-500 mb-2">
-            Link to your offline store locator, maps link, or /locations page.
+            Peta offline store (Google Maps Link) atau tautan internal (misalnya /locations).
           </div>
           <input 
             type="text" 
             value={state.offlineStoreLink || ''} 
             onChange={(e) => setState((s: any) => ({ ...s, offlineStoreLink: e.target.value }))}
             placeholder="e.g., /locations or https://maps.google.com/..."
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold">Instagram Link</label>
+          <input 
+            type="text" 
+            value={state.instagramLink || ''} 
+            onChange={(e) => setState((s: any) => ({ ...s, instagramLink: e.target.value }))}
+            placeholder="https://instagram.com/..."
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold">Facebook Link</label>
+          <input 
+            type="text" 
+            value={state.facebookLink || ''} 
+            onChange={(e) => setState((s: any) => ({ ...s, facebookLink: e.target.value }))}
+            placeholder="https://facebook.com/..."
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
           />
         </div>

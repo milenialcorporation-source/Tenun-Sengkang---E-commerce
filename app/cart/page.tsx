@@ -48,7 +48,7 @@ export default function CartPage() {
               <div className="space-y-6">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex gap-4 border-b border-gray-100 pb-6">
-                    <div className="relative w-24 aspect-[3/4] bg-gray-50">
+                    <div className="relative w-24 aspect-square bg-gray-50">
                        <Image src={item.image?.data || `https://picsum.photos/seed/${item.id}/400/600`} alt={item.name} fill className="object-cover" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-1">

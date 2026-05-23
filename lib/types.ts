@@ -63,6 +63,8 @@ export type StoreState = {
   logo?: ImageInput;
   whatsappNumber?: string;
   offlineStoreLink?: string;
+  instagramLink?: string;
+  facebookLink?: string;
   heroSlides: HeroSlide[];
   collections: Collection[];
   products: Product[];

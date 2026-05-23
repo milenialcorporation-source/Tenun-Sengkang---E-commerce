@@ -169,7 +169,7 @@ export default function AccountPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {wishlistProducts.map(product => (
                       <Link key={product.id} href={`/product/${product.id}`} className="group block border border-gray-100 p-4 hover:border-gray-300 transition-colors">
-                        <div className="relative aspect-[3/4] mb-4 bg-gray-50">
+                        <div className="relative aspect-square mb-4 bg-gray-50">
                           {product.images && product.images.length > 0 ? (
                             <Image src={product.images[0]?.data || `https://picsum.photos/seed/${product.id}1/400/600`} alt={product.name || 'Product'} fill className="object-cover" referrerPolicy="no-referrer" />
                           ) : (

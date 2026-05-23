@@ -3,13 +3,19 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/lib/store';
 
 export default function Footer() {
   const pathname = usePathname();
+  const { state } = useStore();
 
   if (pathname?.startsWith('/manage-store-secret')) {
     return null;
   }
+
+  const contactHref = state.whatsappNumber
+    ? (state.whatsappNumber.startsWith('http') ? state.whatsappNumber : `https://wa.me/${state.whatsappNumber.replace(/\D/g,'')}`)
+    : "#";
 
   return (
     <footer className="bg-secondary text-white pt-16 pb-8">
@@ -38,7 +44,7 @@ export default function Footer() {
           <div>
              <h3 className="text-xs uppercase tracking-widest font-semibold mb-6 opacity-50">Support</h3>
             <ul className="space-y-4 text-sm opacity-80">
-               <li><Link href="#" className="hover:text-primary hover:opacity-100 transition-colors">Contact Us</Link></li>
+               <li><a href={contactHref} target={contactHref !== "#" ? "_blank" : undefined} rel={contactHref !== "#" ? "noopener noreferrer" : undefined} className="hover:text-primary hover:opacity-100 transition-colors">Contact Us</a></li>
                <li><Link href="#" className="hover:text-primary hover:opacity-100 transition-colors">Shipping & Returns</Link></li>
                <li><Link href="#" className="hover:text-primary hover:opacity-100 transition-colors">Care Guide</Link></li>
             </ul>
@@ -47,8 +53,8 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-xs opacity-50">
           <p>&copy; {new Date().getFullYear()} Kain Sutra Sengkang. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-             <Link href="#">Instagram</Link>
-             <Link href="#">Facebook</Link>
+             <a href={state.instagramLink || "#"} target={state.instagramLink ? "_blank" : undefined} rel={state.instagramLink ? "noopener noreferrer" : undefined}>Instagram</a>
+             <a href={state.facebookLink || "#"} target={state.facebookLink ? "_blank" : undefined} rel={state.facebookLink ? "noopener noreferrer" : undefined}>Facebook</a>
           </div>
         </div>
       </div>
