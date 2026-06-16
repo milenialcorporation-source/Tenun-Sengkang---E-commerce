@@ -17,26 +17,43 @@ const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
 });
 
-export const metadata: Metadata = {
-  title: 'Kain Sutra Sengkang | Luxury Silk',
-  description: 'Keindahan Kain Sutra Asli dari Sengkang',
-  openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  let openGraphImage = 'https://picsum.photos/1200/630';
+
+  try {
+    await initializeDatabase();
+    const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
+    if (rows && rows.length > 0) {
+      const state = JSON.parse(rows[0].data);
+      if (state.logo?.data) {
+        openGraphImage = state.logo.data;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching initial server state for metadata:', error);
+  }
+
+  return {
     title: 'Kain Sutra Sengkang | Luxury Silk',
     description: 'Keindahan Kain Sutra Asli dari Sengkang',
-    url: 'https://khaki-dunlin-111283.hostingersite.com',
-    siteName: 'Kain Sutra Sengkang',
-    images: [
-      {
-        url: 'https://picsum.photos/1200/630',
-        width: 1200,
-        height: 630,
-        alt: 'Kain Sutra Sengkang',
-      },
-    ],
-    locale: 'id_ID',
-    type: 'website',
-  },
-};
+    openGraph: {
+      title: 'Kain Sutra Sengkang | Luxury Silk',
+      description: 'Keindahan Kain Sutra Asli dari Sengkang',
+      url: 'https://khaki-dunlin-111283.hostingersite.com',
+      siteName: 'Kain Sutra Sengkang',
+      images: [
+        {
+          url: openGraphImage,
+          width: 800,
+          height: 800,
+          alt: 'Kain Sutra Sengkang Logo',
+        },
+      ],
+      locale: 'id_ID',
+      type: 'website',
+    },
+  };
+}
 
 // We use dynamic rendering to ensure fresh data, but cache could be tweaked.
 export const dynamic = 'force-dynamic';
