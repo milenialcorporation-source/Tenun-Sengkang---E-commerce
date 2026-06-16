@@ -65,6 +65,9 @@ export type StoreState = {
   offlineStoreLink?: string;
   instagramLink?: string;
   facebookLink?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  openGraphImage?: ImageInput;
   heroSlides: HeroSlide[];
   collections: Collection[];
   products: Product[];

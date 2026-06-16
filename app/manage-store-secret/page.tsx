@@ -209,6 +209,22 @@ function TabButton({ active, onClick, icon, label }: { active: boolean, onClick:
 
 // Subcomponents for each tab
 function GeneralSettingsManager({ state, setState }: any) {
+  const [ogUrl, setOgUrl] = useState('');
+
+  const handleOgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const base64 = await handleImageUpload(e.target.files[0]);
+      setState((s: any) => ({ ...s, openGraphImage: { type: 'base64', data: base64 } }));
+    }
+  };
+
+  const saveOgUrl = () => {
+    if (ogUrl) {
+      setState((s: any) => ({ ...s, openGraphImage: { type: 'url', data: ogUrl } }));
+      setOgUrl('');
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -265,6 +281,69 @@ function GeneralSettingsManager({ state, setState }: any) {
             placeholder="https://facebook.com/..."
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
           />
+        </div>
+      </div>
+
+      <div className="pt-8 border-t border-gray-200">
+        <h3 className="text-lg font-semibold mb-1">SEO & Social Sharing Metadata</h3>
+        <p className="text-sm text-gray-500 mb-6">Manage how your site appears on search engines and social media platforms (like WhatsApp, Twitter, Facebook).</p>
+
+        <div className="space-y-6 max-w-xl">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Metadata Title</label>
+            <input 
+              type="text" 
+              value={state.metaTitle || ''} 
+              onChange={(e) => setState((s: any) => ({ ...s, metaTitle: e.target.value }))}
+              placeholder="e.g., Kain Sutra Sengkang | Luxury Silk"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Metadata Description</label>
+            <textarea 
+              rows={3}
+              value={state.metaDescription || ''} 
+              onChange={(e) => setState((s: any) => ({ ...s, metaDescription: e.target.value }))}
+              placeholder="e.g., Keindahan Kain Sutra Asli dari Sengkang"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+            />
+          </div>
+
+          <div className="space-y-2 border-t border-gray-100 pt-4">
+            <label className="block text-sm font-semibold mb-2">Social Share Image (OpenGraph)</label>
+            <div className="p-4 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center min-h-[160px] mb-4">
+              {state.openGraphImage ? (
+                <img src={state.openGraphImage.data} alt="OpenGraph Preview" className="max-h-32 object-contain" />
+              ) : (
+                <p className="text-sm text-gray-400">No image set. Will fallback to site logo or default image.</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <span className="text-xs font-semibold text-gray-500 uppercase">Upload File</span>
+                <input type="file" accept="image/*" onChange={handleOgUpload} className="mt-1 w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-200 file:text-black" />
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-gray-500 uppercase">Or Paste URL</span>
+                <div className="flex gap-2 mt-1">
+                  <input type="text" value={ogUrl} onChange={e => setOgUrl(e.target.value)} placeholder="https://..." className="flex-1 border border-gray-300 rounded px-2 py-1 text-xs" />
+                  <button onClick={saveOgUrl} className="bg-black text-white px-3 py-1 rounded text-xs">Set</button>
+                </div>
+              </div>
+            </div>
+
+            {state.openGraphImage && (
+              <button 
+                onClick={() => setState((s: any) => { const newState = {...s}; delete newState.openGraphImage; return newState; })} 
+                className="mt-3 text-xs text-red-600 font-medium flex items-center gap-1 hover:underline"
+              >
+                <Trash2 size={12} /> Remove Social Image
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
