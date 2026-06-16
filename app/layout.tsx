@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     if (state.metaDescription) metaDescription = state.metaDescription;
   }
 
-  const siteUrl = 'https://khaki-dunlin-111283.hostingersite.com';
+  const siteUrl = 'https://tenun.store';
 
   return {
     metadataBase: new URL(siteUrl),
@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: metaTitle,
       images: [
         {
-          url: '/api/og-image', // Next.js will resolve this against metadataBase
+          url: '/api/og-image?t=' + Date.now(), // cache busting for bots
           width: 800,
           height: 800,
           alt: metaTitle,
@@ -66,8 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// We use dynamic rendering to ensure fresh data, but cache could be tweaked.
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
   const initialServerState = await getStoreState();
