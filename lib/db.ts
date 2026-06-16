@@ -13,6 +13,7 @@ if (process.env.MYSQL_HOST) {
     connectionLimit: 10,
     maxIdle: 10, 
     idleTimeout: 60000,
+    connectTimeout: 5000, // Add timeout to prevent hanging forever
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
@@ -37,8 +38,16 @@ export async function query(sql: string, values?: any[]) {
     }
     return [];
   }
-  const [results] = await pool.execute(sql, values);
-  return results;
+  
+  try {
+    const [results] = await pool.execute(sql, values);
+    return results;
+  } catch (error) {
+    console.error(`Database query failed: ${sql}`, error);
+    // If we're failing to query, we should probably throw so the caller knows,
+    // or return a safe fallback if it's a critical read like state.
+    throw error;
+  }
 }
 
 let isInitialized = false;
