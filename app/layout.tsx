@@ -18,7 +18,6 @@ const cormorant = Cormorant_Garamond({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  let openGraphImage = 'https://picsum.photos/1200/630';
   let metaTitle = 'Kain Sutra Sengkang | Luxury Silk';
   let metaDescription = 'Keindahan Kain Sutra Asli dari Sengkang';
 
@@ -27,12 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
     const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
     if (rows && rows.length > 0) {
       const state = JSON.parse(rows[0].data);
-      if (state.openGraphImage?.data) {
-        openGraphImage = state.openGraphImage.data;
-      } else if (state.logo?.data) {
-        openGraphImage = state.logo.data;
-      }
-      
       if (state.metaTitle) metaTitle = state.metaTitle;
       if (state.metaDescription) metaDescription = state.metaDescription;
     }
@@ -40,17 +33,20 @@ export async function generateMetadata(): Promise<Metadata> {
     console.error('Error fetching initial server state for metadata:', error);
   }
 
+  const siteUrl = 'https://khaki-dunlin-111283.hostingersite.com';
+
   return {
+    metadataBase: new URL(siteUrl),
     title: metaTitle,
     description: metaDescription,
     openGraph: {
       title: metaTitle,
       description: metaDescription,
-      url: 'https://khaki-dunlin-111283.hostingersite.com',
+      url: siteUrl,
       siteName: metaTitle,
       images: [
         {
-          url: openGraphImage,
+          url: '/api/og-image', // Next.js will resolve this against metadataBase
           width: 800,
           height: 800,
           alt: metaTitle,
