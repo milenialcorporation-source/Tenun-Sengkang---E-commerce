@@ -5,6 +5,7 @@ import { StoreProvider } from '@/lib/store';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { query, initializeDatabase } from '@/lib/db';
+import { cache } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,20 +18,27 @@ const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  let metaTitle = 'Kain Sutra Sengkang | Luxury Silk';
-  let metaDescription = 'Keindahan Kain Sutra Asli dari Sengkang';
-
+const getStoreState = cache(async () => {
   try {
     await initializeDatabase();
     const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
     if (rows && rows.length > 0) {
-      const state = JSON.parse(rows[0].data);
-      if (state.metaTitle) metaTitle = state.metaTitle;
-      if (state.metaDescription) metaDescription = state.metaDescription;
+      return JSON.parse(rows[0].data);
     }
   } catch (error) {
-    console.error('Error fetching initial server state for metadata:', error);
+    console.error('Error fetching initial server state:', error);
+  }
+  return null;
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  let metaTitle = 'Kain Sutra Sengkang | Luxury Silk';
+  let metaDescription = 'Keindahan Kain Sutra Asli dari Sengkang';
+
+  const state = await getStoreState();
+  if (state) {
+    if (state.metaTitle) metaTitle = state.metaTitle;
+    if (state.metaDescription) metaDescription = state.metaDescription;
   }
 
   const siteUrl = 'https://khaki-dunlin-111283.hostingersite.com';
@@ -62,17 +70,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
-  let initialServerState = null;
-  
-  try {
-    await initializeDatabase();
-    const rows = await query('SELECT data FROM store_state ORDER BY id DESC LIMIT 1') as any[];
-    if (rows && rows.length > 0) {
-      initialServerState = JSON.parse(rows[0].data);
-    }
-  } catch (error) {
-    console.error('Error fetching initial server state:', error);
-  }
+  const initialServerState = await getStoreState();
 
   return (
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
@@ -88,3 +86,4 @@ export default async function RootLayout({children}: {children: React.ReactNode}
     </html>
   );
 }
+
