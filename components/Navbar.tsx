@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { ShoppingBag, Menu, X, Search, Heart, User, Camera, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart, User, Camera, ChevronRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -17,6 +17,17 @@ export default function Navbar() {
   const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    if (e.ctrlKey || e.metaKey) return;
+    e.preventDefault();
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+    startTransition(() => {
+      router.push(url);
+    });
+  };
 
   useEffect(() => {
     // Check auth status on mount and when pathname changes
@@ -70,7 +81,9 @@ export default function Navbar() {
       localStorage.removeItem('userEmail');
       setIsLoggedIn(false);
       setIsMenuOpen(false);
-      router.push('/');
+      startTransition(() => {
+        router.push('/');
+      });
     }
   };
 
@@ -79,14 +92,24 @@ export default function Navbar() {
       e.preventDefault();
       const query = e.currentTarget.value;
       if (query.trim() !== '') {
-        router.push(`/shop?q=${encodeURIComponent(query)}`);
         setIsSearchOpen(false);
+        startTransition(() => {
+          router.push(`/shop?q=${encodeURIComponent(query)}`);
+        });
       }
     }
   };
 
   return (
     <>
+      {isPending && (
+        <div className="fixed inset-0 bg-white/80 z-[100] flex items-center justify-center backdrop-blur-sm">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+            <p className="text-xs uppercase tracking-widest font-semibold text-gray-500">Memuat Halaman...</p>
+          </div>
+        </div>
+      )}
       <nav ref={searchRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="px-4 md:px-8 bg-transparent relative z-50">
             {/* Mobile Search Overlay */}
@@ -144,7 +167,7 @@ export default function Navbar() {
 
               {/* Center section: Logo */}
               <div className="flex-shrink-0 flex flex-col items-center justify-center flex-1">
-                <Link href="/" className="flex flex-col items-center">
+                <Link href="/" className="flex flex-col items-center" onClick={(e) => handleNavigation(e, '/')}>
                   {logoSrc ? (
                     <div className="relative h-14 w-48 md:h-16 md:w-64 mb-1">
                       <Image src={logoSrc} alt="Website Logo" fill className="object-contain" referrerPolicy="no-referrer" />
@@ -159,10 +182,10 @@ export default function Navbar() {
 
               {/* Right section: Icons */}
               <div className="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
-                <Link href={isLoggedIn ? "/account" : "/login"} className="hover:opacity-70 transition-opacity">
+                <Link href={isLoggedIn ? "/account" : "/login"} className="hover:opacity-70 transition-opacity" onClick={(e) => handleNavigation(e, isLoggedIn ? '/account' : '/login')}>
                   <User className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
                 </Link>
-                <Link href="/cart" className="hover:opacity-70 transition-opacity">
+                <Link href="/cart" className="hover:opacity-70 transition-opacity" onClick={(e) => handleNavigation(e, '/cart')}>
                   <ShoppingBag className="w-5 h-5 md:w-[22px] md:h-[22px] text-black" strokeWidth={1.5} />
                 </Link>
               </div>
@@ -200,7 +223,7 @@ export default function Navbar() {
                           key={tag} 
                           href="/shop" 
                           className="px-3 py-1.5 border border-gray-200 text-[10px] uppercase tracking-widest text-gray-600 hover:border-black hover:text-black transition-colors"
-                          onClick={() => setIsSearchOpen(false)}
+                          onClick={(e) => handleNavigation(e, '/shop')}
                         >
                           {tag}
                         </Link>
@@ -211,7 +234,7 @@ export default function Navbar() {
                   {/* Right Column: Featured Cards */}
                   <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {state.megaMenuCards?.slice(0, 4).map((card, idx) => (
-                      <Link key={card.id || idx} href={card.link || '/shop'} className="group" onClick={() => setIsSearchOpen(false)}>
+                      <Link key={card.id || idx} href={card.link || '/shop'} className="group" onClick={(e) => handleNavigation(e, card.link || '/shop')}>
                         <div className="relative aspect-[16/9] md:aspect-[3/2] overflow-hidden mb-3 bg-gray-100">
                           <Image src={card.image?.data || `https://picsum.photos/seed/mm${idx}/800/500`} alt={card.title || 'Category'} fill className="object-cover group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
                         </div>
@@ -268,7 +291,7 @@ export default function Navbar() {
               <div className="py-6 px-8 flex-1">
                 <ul className="space-y-6">
                   <li>
-                    <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/shop" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={(e) => handleNavigation(e, '/shop')}>
                       Semua Produk
                     </Link>
                   </li>
@@ -290,7 +313,7 @@ export default function Navbar() {
                         >
                           {hProducts.map((product) => (
                             <li key={product.id}>
-                              <Link href={`/product/${product.id}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={() => setIsMenuOpen(false)}>
+                              <Link href={`/product/${product.id}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={(e) => handleNavigation(e, `/product/${product.id}`)}>
                                 {product.name}
                               </Link>
                             </li>
@@ -317,7 +340,7 @@ export default function Navbar() {
                         >
                           {hCollections.map((col) => (
                             <li key={col.id}>
-                              <Link href={`/shop?category=${encodeURIComponent(col.name)}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={() => setIsMenuOpen(false)}>
+                              <Link href={`/shop?category=${encodeURIComponent(col.name)}`} className="text-base font-serif hover:text-gray-500 transition-colors block" onClick={(e) => handleNavigation(e, `/shop?category=${encodeURIComponent(col.name)}`)}>
                                 {col.name}
                               </Link>
                             </li>
@@ -327,7 +350,7 @@ export default function Navbar() {
                     </AnimatePresence>
                   </li>
                   <li className="pt-6 border-t border-gray-100 mt-6">
-                    <Link href="/profile" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/profile" className="text-xl font-serif hover:text-gray-500 transition-colors" onClick={(e) => handleNavigation(e, '/profile')}>
                       Cerita Kami
                     </Link>
                   </li>
@@ -342,7 +365,7 @@ export default function Navbar() {
                       Sign Out
                     </button>
                   ) : (
-                    <Link href="/login" className="text-xs font-semibold uppercase tracking-widest border-b border-black pb-1 hover:text-primary hover:border-primary transition-all" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/login" className="text-xs font-semibold uppercase tracking-widest border-b border-black pb-1 hover:text-primary hover:border-primary transition-all" onClick={(e) => handleNavigation(e, '/login')}>
                       Sign In / Register
                     </Link>
                   )}
