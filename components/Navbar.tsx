@@ -55,8 +55,13 @@ export default function Navbar() {
 
   const logoSrc = getLogo();
 
-  const hProducts = (state.products || []).filter(p => (state.hamburgerProducts || []).includes(p.id));
-  const hCollections = (state.collections || []).filter(c => (state.hamburgerCollections || []).includes(c.id));
+  const hProducts = state.hamburgerProducts?.length 
+    ? (state.products || []).filter(p => state.hamburgerProducts.includes(p.id))
+    : (state.products || []).slice(0, 4);
+
+  const hCollections = state.hamburgerCollections?.length
+    ? (state.collections || []).filter(c => state.hamburgerCollections.includes(c.id))
+    : (state.collections || []).slice(0, 4);
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
