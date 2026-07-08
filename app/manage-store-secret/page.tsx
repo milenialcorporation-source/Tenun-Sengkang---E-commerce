@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { ImageInput, HeroSlide, Collection, Product } from '@/lib/types';
 import Image from 'next/image';
-import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw, Menu, X } from 'lucide-react';
+import { Settings, Image as ImageIcon, Layout, Box, FolderPlus, ToggleLeft, Trash2, Plus, GripVertical, LogOut, Save, RotateCcw, Menu, X, ShoppingBag, Loader2 } from 'lucide-react';
 
 const handleImageUpload = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -15,7 +15,7 @@ const handleImageUpload = (file: File): Promise<string> => {
   });
 };
 
-type Tab = 'general' | 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' | 'profile' | 'collections' | 'products' | 'catalog';
+type Tab = 'general' | 'logo' | 'hero' | 'featuredSections' | 'megaMenu' | 'hamburgerMenu' | 'profile' | 'collections' | 'products' | 'catalog' | 'orders';
 
 export default function AdminDashboard() {
   const { state, savedState, setState, saveToDb, discardChanges } = useStore();
@@ -99,6 +99,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden absolute inset-0 w-full">
+      {isSaving && (
+        <div className="absolute inset-0 bg-white/80 z-[100] flex items-center justify-center backdrop-blur-sm">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+            <p className="text-xs uppercase tracking-widest font-semibold text-gray-500">Menyimpan Perubahan...</p>
+          </div>
+        </div>
+      )}
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 flex-shrink-0 relative z-20">
         <div>
@@ -139,6 +147,7 @@ export default function AdminDashboard() {
           <TabButton active={activeTab === 'collections'} onClick={() => { setActiveTab('collections'); setIsMobileMenuOpen(false); }} icon={<FolderPlus size={18} />} label="Collections/Category" />
           <TabButton active={activeTab === 'products'} onClick={() => { setActiveTab('products'); setIsMobileMenuOpen(false); }} icon={<Box size={18} />} label="Products" />
           <TabButton active={activeTab === 'catalog'} onClick={() => { setActiveTab('catalog'); setIsMobileMenuOpen(false); }} icon={<ToggleLeft size={18} />} label="Catalog Control" />
+          <TabButton active={activeTab === 'orders'} onClick={() => { setActiveTab('orders'); setIsMobileMenuOpen(false); }} icon={<ShoppingBag size={18} />} label="Order Management" />
         </nav>
         <div className="p-4 border-t border-gray-200 space-y-2 flex-shrink-0 bg-white relative z-10">
           {hasChanges && (
@@ -190,6 +199,7 @@ export default function AdminDashboard() {
           {activeTab === 'collections' && <CollectionManager state={state} setState={setState} />}
           {activeTab === 'products' && <ProductManager state={state} setState={setState} />}
           {activeTab === 'catalog' && <CatalogManager state={state} setState={setState} />}
+          {activeTab === 'orders' && <OrderManager />}
         </div>
       </main>
     </div>
@@ -881,19 +891,19 @@ function ProductManager({ state, setState }: any) {
                     <input type="text" value={prod.shopeeLink || ''} onChange={e => updateProd(prod.id, 'shopeeLink', e.target.value)} placeholder="https://shopee.co.id/..." className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary" />
                   </div>
                   <div className="col-span-1 md:col-span-2">
-                    <label className="text-[10px] uppercase font-semibold text-gray-400">Description</label>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Informasi Deskripsi Produk</label>
                     <textarea rows={3} value={prod.description || ''} onChange={e => updateProd(prod.id, 'description', e.target.value)} className="w-full border border-gray-200 py-2 px-3 text-sm focus:outline-none focus:border-primary rounded mt-1 resize-y" placeholder="Product description..."></textarea>
                   </div>
                   <div className="col-span-1 md:col-span-2">
-                    <label className="text-[10px] uppercase font-semibold text-gray-400">Material & Details</label>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Rincian Bahan & Material</label>
                     <textarea rows={2} value={prod.material || ''} onChange={e => updateProd(prod.id, 'material', e.target.value)} className="w-full border border-gray-200 py-2 px-3 text-sm focus:outline-none focus:border-primary rounded mt-1 resize-y" placeholder="e.g. 100% Cotton, Handwoven..."></textarea>
                   </div>
                   <div className="col-span-1 md:col-span-2">
-                    <label className="text-[10px] uppercase font-semibold text-gray-400">Care Instructions</label>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Panduan Perawatan</label>
                     <textarea rows={2} value={prod.careInstructions || ''} onChange={e => updateProd(prod.id, 'careInstructions', e.target.value)} className="w-full border border-gray-200 py-2 px-3 text-sm focus:outline-none focus:border-primary rounded mt-1 resize-y" placeholder="e.g. Dry clean only..."></textarea>
                   </div>
                   <div className="col-span-1 md:col-span-2">
-                    <label className="text-[10px] uppercase font-semibold text-gray-400">Size Guide</label>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Informasi Panduan Ukuran</label>
                     <textarea rows={2} value={prod.sizeGuide || ''} onChange={e => updateProd(prod.id, 'sizeGuide', e.target.value)} className="w-full border border-gray-200 py-2 px-3 text-sm focus:outline-none focus:border-primary rounded mt-1 resize-y" placeholder="e.g. Lebar standar adalah 115cm..."></textarea>
                   </div>
               </div>
@@ -1166,6 +1176,86 @@ function CatalogManager({ state, setState }: any) {
       <div className="p-4 bg-blue-50 border border-blue-100 text-blue-800 text-sm rounded">
          <p><strong>Note:</strong> Olsera integration is mocked for this prototype. Activating this toggle simulates the hybrid environment.</p>
       </div>
+    </div>
+  );
+}
+function OrderManager() {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchOrders() {
+    try {
+      const res = await fetch('/api/orders/admin');
+      const data = await res.json();
+      if (data.success) {
+        setOrders(data.orders);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    try {
+      await fetch('/api/orders/admin', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-xl font-serif mb-6">Order Management</h2>
+      {loading ? (
+        <p className="text-sm text-gray-500">Memuat pesanan...</p>
+      ) : orders.length === 0 ? (
+        <p className="text-sm text-gray-500">Belum ada pesanan.</p>
+      ) : (
+        <div className="space-y-4">
+          {orders.map(order => (
+            <div key={order.id} className="border border-gray-200 p-4 rounded-md">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="font-semibold text-sm">{order.id}</h3>
+                  <p className="text-xs text-gray-500">{order.user_email}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-sm text-primary">Rp {Number(order.total).toLocaleString('id-ID')}</p>
+                  <p className="text-xs text-gray-500">{new Date(order.created_at).toLocaleString('id-ID')}</p>
+                </div>
+              </div>
+              <div className="mb-4">
+                <p className="text-sm">{order.items}</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500">Status:</label>
+                <select 
+                  value={order.status}
+                  onChange={(e) => updateStatus(order.id, e.target.value)}
+                  className="border border-gray-200 text-sm py-1 px-2 focus:outline-none focus:border-black rounded-sm"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

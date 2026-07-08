@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useTransition } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { ShoppingBag, Menu, X, Search, Heart, User, Camera, ChevronRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
@@ -15,18 +15,30 @@ export default function Navbar() {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsNavigating(false);
+  }, [pathname, searchParams]);
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
     if (e.ctrlKey || e.metaKey) return;
+    const [path] = url.split('?');
+    if (pathname === path && url.indexOf('?') === -1) {
+       // if it's the exact same path with no query, just close menu
+       setIsMenuOpen(false);
+       setIsSearchOpen(false);
+       return;
+    }
     e.preventDefault();
+    setIsNavigating(true);
     setIsMenuOpen(false);
     setIsSearchOpen(false);
-    startTransition(() => {
-      router.push(url);
-    });
+    router.push(url);
   };
 
   useEffect(() => {
@@ -81,9 +93,8 @@ export default function Navbar() {
       localStorage.removeItem('userEmail');
       setIsLoggedIn(false);
       setIsMenuOpen(false);
-      startTransition(() => {
-        router.push('/');
-      });
+      setIsNavigating(true);
+      router.push('/');
     }
   };
 
@@ -92,17 +103,16 @@ export default function Navbar() {
       e.preventDefault();
       const query = e.currentTarget.value;
       if (query.trim() !== '') {
+        setIsNavigating(true);
         setIsSearchOpen(false);
-        startTransition(() => {
-          router.push(`/shop?q=${encodeURIComponent(query)}`);
-        });
+        router.push(`/shop?q=${encodeURIComponent(query)}`);
       }
     }
   };
 
   return (
     <>
-      {isPending && (
+      {isNavigating && (
         <div className="fixed inset-0 bg-white/80 z-[100] flex items-center justify-center backdrop-blur-sm">
           <div className="flex flex-col items-center">
             <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
