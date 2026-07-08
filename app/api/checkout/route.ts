@@ -14,8 +14,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Attempt to store in DB if not purely guest without DB
-    if (email && process.env.DATABASE_URL) {
+    // Attempt to store in DB
+    if (email) {
       try {
         await query(
           'INSERT INTO orders (id, user_email, total, status, items) VALUES (?, ?, ?, ?, ?)',
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       console.warn("XENDIT_SECRET_KEY is missing, returning mock redirect.");
       return NextResponse.json({ 
         success: true, 
-        invoiceUrl: '/account', // Redirect locally for demo
+        invoiceUrl: `/checkout/payment-simulation?orderId=${orderId}invoiceUrl: '/account', // Redirect locally for demoamount=${Number(total) + shippingCost}`,
         orderId 
       });
     }

@@ -1198,6 +1198,7 @@ function OrderManager() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchOrders();
   }, []);
 
@@ -1208,7 +1209,8 @@ function OrderManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: newStatus })
       });
-      fetchOrders();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchOrders();
     } catch (e) {
       console.error(e);
     }

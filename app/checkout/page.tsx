@@ -9,6 +9,7 @@ function CheckoutContent() {
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');
   const [isAuth, setIsAuth] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState<'reguler' | 'yes'>('reguler');
   const searchParams = useSearchParams();
   const productId = searchParams?.get('productId');
   const qtyParam = searchParams?.get('qty');
@@ -31,6 +32,8 @@ function CheckoutContent() {
   // Fallback to a default if no product is selected (for direct visits)
   const itemName = product ? `${product.name} (${qtyNum}${product.productType === 'kain' ? 'm' : 'x'})` : 'Produk (1x)';
   const itemPrice = product ? Number(product.price || 0) * qtyNum : 1500000;
+  const shippingCost = shippingMethod === 'yes' ? 40000 : 25000;
+  const grandTotal = itemPrice + shippingCost;
   
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-24">
@@ -99,13 +102,28 @@ function CheckoutContent() {
                   </div>
                   
                   <div className="mt-8 border-t border-gray-100 pt-6">
-                    <h3 className="text-sm font-semibold uppercase tracking-widest mb-4">Pengiriman (KiriminAja)</h3>
-                    <div className="border border-gray-200 p-4 flex items-center gap-4 cursor-pointer hover:border-black transition-colors">
-                      <input type="radio" id="jneyes" name="shipping" defaultChecked className="text-black focus:ring-black" />
-                      <label htmlFor="jneyes" className="text-sm font-medium uppercase tracking-widest cursor-pointer w-full flex justify-between">
-                        <span>Reguler (2-3 Hari)</span>
-                        <span>Gratis</span>
-                      </label>
+                    <h3 className="text-sm font-semibold uppercase tracking-widest mb-4">Pengiriman (Simulasi)</h3>
+                    <div className="space-y-3">
+                      <div 
+                        className={`border p-4 flex items-center gap-4 cursor-pointer transition-colors ${shippingMethod === 'reguler' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-black'}`} 
+                        onClick={() => setShippingMethod('reguler')}
+                      >
+                        <input type="radio" checked={shippingMethod === 'reguler'} readOnly className="text-black focus:ring-black" />
+                        <label className="text-sm font-medium uppercase tracking-widest cursor-pointer w-full flex justify-between">
+                          <span>Reguler (2-3 Hari)</span>
+                          <span>Rp 25.000</span>
+                        </label>
+                      </div>
+                      <div 
+                        className={`border p-4 flex items-center gap-4 cursor-pointer transition-colors ${shippingMethod === 'yes' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-black'}`} 
+                        onClick={() => setShippingMethod('yes')}
+                      >
+                        <input type="radio" checked={shippingMethod === 'yes'} readOnly className="text-black focus:ring-black" />
+                        <label className="text-sm font-medium uppercase tracking-widest cursor-pointer w-full flex justify-between">
+                          <span>Express (1 Hari)</span>
+                          <span>Rp 40.000</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -118,7 +136,7 @@ function CheckoutContent() {
 
                     const newOrder = {
                       orderId: `ORD-${Date.now()}`,
-                      total: itemPrice,
+                      total: grandTotal,
                       items: itemName,
                       isGuest: !isLoggedIn
                     };
@@ -188,7 +206,7 @@ function CheckoutContent() {
                  </div>
                  <div className="flex justify-between">
                    <span>Pengiriman</span>
-                   <span>Gratis</span>
+                   <span>Rp {shippingCost.toLocaleString('id-ID')}</span>
                  </div>
                </div>
 
@@ -204,7 +222,7 @@ function CheckoutContent() {
 
                <div className="flex justify-between font-semibold border-t border-gray-200 pt-4 mb-4">
                  <span>Total Belanja</span>
-                 <span>Rp {itemPrice.toLocaleString('id-ID')}</span>
+                 <span>Rp {grandTotal.toLocaleString('id-ID')}</span>
                </div>
                
                <p className="text-[10px] text-gray-400 mt-6 leading-relaxed">

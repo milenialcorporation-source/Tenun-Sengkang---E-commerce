@@ -13,7 +13,7 @@ if (process.env.MYSQL_HOST) {
     connectionLimit: 10,
     maxIdle: 10, 
     idleTimeout: 60000,
-    connectTimeout: 5000, // Add timeout to prevent hanging forever
+    connectTimeout: 5000,
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
@@ -22,10 +22,11 @@ if (process.env.MYSQL_HOST) {
 
 // In-memory fallback if no DB configured
 let inMemoryState: any = null;
+let inMemoryOrders: any[] = [];
+let inMemoryWishlist: any[] = [];
 
 export async function query(sql: string, values?: any[]) {
   if (!pool) {
-    // Basic in-memory mock for state
     if (sql.includes('SELECT data FROM store_state')) {
       return inMemoryState ? [{ data: inMemoryState }] : [];
     }
@@ -36,6 +37,31 @@ export async function query(sql: string, values?: any[]) {
     if (sql.includes('SELECT COUNT(*)')) {
       return [{ count: inMemoryState ? 1 : 0 }];
     }
+    
+    // Orders
+    if (sql.includes('INSERT INTO orders')) {
+       inMemoryOrders.push({
+         id: values?.[0],
+         user_email: values?.[1],
+         total: values?.[2],
+         status: values?.[3],
+         items: values?.[4],
+         created_at: new Date().toISOString()
+       });
+       return [{ affectedRows: 1 }];
+    }
+    if (sql.includes('SELECT * FROM orders WHERE user_email =')) {
+       return inMemoryOrders.filter(o => o.user_email === values?.[0]).sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    if (sql.includes('SELECT * FROM orders ORDER BY created_at DESC') || sql.includes('SELECT * FROM orders')) {
+       return [...inMemoryOrders].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    if (sql.includes('UPDATE orders SET status = ? WHERE id = ?')) {
+       const order = inMemoryOrders.find(o => o.id === values?.[1]);
+       if (order) order.status = values?.[0];
+       return [{ affectedRows: 1 }];
+    }
+
     return [];
   }
   
@@ -44,8 +70,6 @@ export async function query(sql: string, values?: any[]) {
     return results;
   } catch (error) {
     console.error(`Database query failed: ${sql}`, error);
-    // If we're failing to query, we should probably throw so the caller knows,
-    // or return a safe fallback if it's a critical read like state.
     throw error;
   }
 }
@@ -54,11 +78,13 @@ let isInitialized = false;
 
 export async function initializeDatabase() {
   if (isInitialized) return;
+
   if (!pool) {
     console.log('MySQL not configured, using in-memory fallback.');
     isInitialized = true;
     return;
   }
+
   try {
     await query(`
       CREATE TABLE IF NOT EXISTS store_state (
@@ -103,6 +129,7 @@ export async function initializeDatabase() {
     if (rows[0].count === 0) {
       await query("INSERT INTO store_state (data) VALUES (?)", ['{}']);
     }
+
     console.log("MySQL Database initialized successfully.");
     isInitialized = true;
   } catch (error) {
