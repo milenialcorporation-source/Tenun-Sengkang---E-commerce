@@ -5,7 +5,7 @@ import { StoreProvider } from '@/lib/store';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { query, initializeDatabase } from '@/lib/db';
-import { cache } from 'react';
+import { cache, Suspense } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -75,7 +75,9 @@ export default async function RootLayout({children}: {children: React.ReactNode}
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
       <body suppressHydrationWarning className="antialiased min-h-screen flex flex-col">
         <StoreProvider initialServerState={initialServerState}>
-          <Navbar />
+          <Suspense fallback={null}>
+            <Navbar />
+          </Suspense>
           <main className="flex-1">
             {children}
           </main>
