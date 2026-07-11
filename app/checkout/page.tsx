@@ -150,10 +150,11 @@ function CheckoutContent() {
                     const email = emailInput?.value || localStorage.getItem('userEmail') || 'guest@example.com';
                     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+                    const simplifiedItems = checkoutItems.map(item => { const { image, tokopediaLink, shopeeLink, extParam, extraParams, ...rest } = item; return rest; });
                     const newOrder = {
                       orderId: `ORD-${Date.now()}`,
                       total: grandTotal,
-                      items: JSON.stringify({ summary: itemName, list: checkoutItems }),
+                      items: JSON.stringify({ summary: itemName, list: simplifiedItems }),
                       isGuest: !isLoggedIn
                     };
 

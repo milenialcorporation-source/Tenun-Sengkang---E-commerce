@@ -53,6 +53,9 @@ export async function query(sql: string, values?: any[]) {
     if (sql.includes('SELECT * FROM orders WHERE user_email =')) {
        return inMemoryOrders.filter(o => o.user_email === values?.[0]).sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
+    if (sql.includes('SELECT status, items FROM orders WHERE id = ?') || sql.includes('SELECT items FROM orders WHERE id = ?')) {
+       return inMemoryOrders.filter(o => o.id === values?.[0]);
+    }
     if (sql.includes('SELECT * FROM orders ORDER BY created_at DESC') || sql.includes('SELECT * FROM orders')) {
        return [...inMemoryOrders].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }

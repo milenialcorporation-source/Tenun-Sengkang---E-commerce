@@ -178,7 +178,8 @@ export default function AccountPage() {
         </div>
       );
     } catch {
-      return <p className="text-sm">{order.items}</p>;
+      const fallbackStr = typeof order.items === 'string' ? (order.items.length > 50 ? order.items.substring(0, 50) + '...' : order.items) : 'Format produk tidak valid';
+      return <p className="text-sm">{fallbackStr}</p>;
     }
   })()}
                       </div>
