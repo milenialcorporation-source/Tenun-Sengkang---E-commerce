@@ -1258,7 +1258,15 @@ function OrderManager() {
         </div>
       );
     } catch {
-      const fallbackStr = typeof order.items === 'string' ? (order.items.length > 50 ? order.items.substring(0, 50) + '...' : order.items) : 'Format produk tidak valid';
+      let fallbackStr = 'Detail produk';
+      if (typeof order.items === 'string') {
+        const match = order.items.match(/"summary"\s*:\s*"([^"]+)"/);
+        if (match) {
+          fallbackStr = match[1];
+        } else {
+          fallbackStr = order.items.length > 50 ? order.items.substring(0, 50) + '...' : order.items;
+        }
+      }
       return <p className="text-sm">{fallbackStr}</p>;
     }
   })()}
