@@ -125,6 +125,11 @@ export default function ProductPage() {
                  {product.uom || (product.productType === 'kain' ? 'Per Meter' : 'Per Pcs')}
                </span>
              </p>
+             {product.stock !== undefined && (
+               <p className="text-sm font-semibold text-gray-600 mb-6">
+                 Stock Tersedia: {product.stock} {product.productType === 'kain' ? 'Meter' : 'Pcs'}
+               </p>
+             )}
              {product.productType === 'kain' && (
                <div className="mb-8">
                  <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">Panjang Pesanan (Meter)</label>
@@ -151,7 +156,7 @@ export default function ProductPage() {
 
              <div className="space-y-6">
                <div className="flex gap-4">
-                 <button onClick={() => {
+                 <button disabled={product.stock !== undefined && product.stock <= 0} onClick={() => {
                    if (typeof window !== 'undefined') {
                      const existingCartStr = localStorage.getItem('cart');
                      let cart = existingCartStr ? JSON.parse(existingCartStr) : [];
@@ -166,6 +171,12 @@ export default function ProductPage() {
                      }
 
                      const itemIndex = cart.findIndex((item: any) => item.id === product.id && item.isKain === (product.productType === 'kain'));
+                     const currentQtyInCart = itemIndex > -1 ? cart[itemIndex].quantity : 0;
+                     if (product.stock !== undefined && currentQtyInCart + qty > product.stock) {
+                       alert(`Maaf, stock tidak mencukupi. Stock tersisa: ${product.stock - currentQtyInCart}`);
+                       return;
+                     }
+
                      if (itemIndex > -1) {
                        cart[itemIndex].quantity += qty;
                      } else {
@@ -174,10 +185,10 @@ export default function ProductPage() {
                      localStorage.setItem('cart', JSON.stringify(cart));
                      alert('Produk ditambahkan ke keranjang!');
                    }
-                 }} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors">
+                 }} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                    Add to Cart
                  </button>
-                 <button onClick={() => {
+                 <button disabled={product.stock !== undefined && product.stock <= 0} onClick={() => {
                    let qty = 1;
                    if (product.productType === 'kain') {
                      qty = parseFloat(kainLength);
@@ -186,8 +197,12 @@ export default function ProductPage() {
                        return;
                      }
                    }
+                   if (product.stock !== undefined && qty > product.stock) {
+                     alert(`Maaf, stock tidak mencukupi. Stock tersisa: ${product.stock}`);
+                     return;
+                   }
                    router.push(`/checkout?productId=${product.id}&qty=${qty}`);
-                 }} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors">
+                 }} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                    Beli Sekarang
                  </button>
                  <button onClick={(e) => toggleWishlist(e, product.id)} className={`px-5 border border-gray-200 transition-colors flex items-center justify-center ${wishlist.includes(product.id) ? 'text-red-500 border-red-200' : 'hover:border-black text-gray-600'}`}>

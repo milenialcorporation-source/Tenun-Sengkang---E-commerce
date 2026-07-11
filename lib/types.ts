@@ -35,6 +35,7 @@ export type Product = {
   material?: string;
   careInstructions?: string;
   sizeGuide?: string;
+  stock?: number;
 };
 
 export type FeaturedSection = {

@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
+let content = `import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
 export async function POST(req: Request) {
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
               let stockChanged = false;
               if (state.products) {
                 for (const item of itemsData.list) {
-                  const product = state.products.find((p: any) => p.id === item.id);
+                  const product = state.products.find((p) => p.id === item.id);
                   if (product && product.stock !== undefined) {
                     product.stock = Math.max(0, product.stock - item.quantity);
                     stockChanged = true;
@@ -49,3 +50,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+`;
+
+fs.writeFileSync('app/api/checkout/simulate-payment/route.ts', content);

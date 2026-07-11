@@ -152,6 +152,11 @@ function ShopContent() {
                         / {product.uom?.replace(/per /i, '') || 'pcs'}
                       </span>
                     </span>
+                    {product.stock !== undefined && (
+                      <span className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                        Stock: {product.stock} {product.productType === 'kain' ? 'm' : 'pcs'}
+                      </span>
+                    )}
                   </div>
                 </div>
               </Link>

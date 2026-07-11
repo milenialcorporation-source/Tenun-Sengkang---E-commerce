@@ -831,6 +831,10 @@ function ProductManager({ state, setState }: any) {
                     <input type="number" value={prod.price} onChange={e => updateProd(prod.id, 'price', parseInt(e.target.value) || 0)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary" />
                   </div>
                   <div>
+                    <label className="text-[10px] uppercase font-semibold text-gray-400">Stock (Optional)</label>
+                    <input type="number" value={prod.stock !== undefined ? prod.stock : ''} onChange={e => updateProd(prod.id, 'stock', e.target.value ? parseInt(e.target.value) : undefined)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary" placeholder="Unlimited" />
+                  </div>
+                  <div>
                     <label className="text-[10px] uppercase font-semibold text-gray-400">Category</label>
                     <select value={prod.category} onChange={e => updateProd(prod.id, 'category', e.target.value)} className="w-full border-b border-gray-200 py-1 text-sm focus:outline-none focus:border-primary bg-white">
                       <option value="">-- Select Category --</option>
@@ -1238,7 +1242,25 @@ function OrderManager() {
                 </div>
               </div>
               <div className="mb-4">
-                <p className="text-sm">{order.items}</p>
+                {(() => {
+    try {
+      const parsed = JSON.parse(order.items);
+      return (
+        <div>
+          <p className="text-sm font-medium">{parsed.summary || order.items}</p>
+          {parsed.list && parsed.list.length > 0 && (
+             <ul className="text-xs text-gray-500 mt-2 space-y-1">
+               {parsed.list.map((item: any, i: number) => (
+                  <li key={i}>• {item.name} x {item.quantity} {item.isKain ? 'Meter' : 'Pcs'}</li>
+               ))}
+             </ul>
+          )}
+        </div>
+      );
+    } catch {
+      return <p className="text-sm">{order.items}</p>;
+    }
+  })()}
               </div>
               <div className="flex items-center gap-4">
                 <label className="text-xs font-semibold uppercase tracking-widest text-gray-500">Status:</label>
@@ -1247,9 +1269,10 @@ function OrderManager() {
                   onChange={(e) => updateStatus(order.id, e.target.value)}
                   className="border border-gray-200 text-sm py-1 px-2 focus:outline-none focus:border-black rounded-sm"
                 >
-                  <option value="Pending">Pending</option>
+                  <option value="Pending">Pending / Belum Bayar</option>
+                  <option value="Paid">Paid / Perlu Dikirim</option>
                   <option value="Processing">Processing</option>
-                  <option value="Shipped">Shipped</option>
+                  <option value="Shipped">Shipped / Dikirim</option>
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>

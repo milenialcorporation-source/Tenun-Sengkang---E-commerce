@@ -26,12 +26,28 @@ function CheckoutContent() {
     }
   }, []);
 
+  const [cartItems, setCartItems] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedCartStr = localStorage.getItem('cart');
+      if (storedCartStr) setCartItems(JSON.parse(storedCartStr));
+    }
+  }, []);
+
   const product = (state.products || []).find(p => p.id === productId);
   const qtyNum = qtyParam ? parseFloat(qtyParam) : 1;
 
-  // Fallback to a default if no product is selected (for direct visits)
-  const itemName = product ? `${product.name} (${qtyNum}${product.productType === 'kain' ? 'm' : 'x'})` : 'Produk (1x)';
-  const itemPrice = product ? Number(product.price || 0) * qtyNum : 1500000;
+  let checkoutItems: any[] = [];
+  if (product) {
+    checkoutItems = [{ ...product, quantity: qtyNum }];
+  } else if (cartItems.length > 0) {
+    checkoutItems = cartItems;
+  }
+
+  const itemPrice = checkoutItems.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
+  const itemName = checkoutItems.map(item => `${item.name} (${item.quantity}${item.productType === 'kain' ? 'm' : 'x'})`).join(', ') || 'Produk';
+
   const shippingCost = shippingMethod === 'yes' ? 40000 : 25000;
   const grandTotal = itemPrice + shippingCost;
   
@@ -137,7 +153,7 @@ function CheckoutContent() {
                     const newOrder = {
                       orderId: `ORD-${Date.now()}`,
                       total: grandTotal,
-                      items: itemName,
+                      items: JSON.stringify({ summary: itemName, list: checkoutItems }),
                       isGuest: !isLoggedIn
                     };
 
