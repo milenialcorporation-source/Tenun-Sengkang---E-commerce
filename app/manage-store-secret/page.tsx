@@ -1263,19 +1263,48 @@ function OrderManager() {
   })()}
               </div>
               <div className="flex items-center gap-4">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500">Status:</label>
-                <select 
-                  value={order.status}
-                  onChange={(e) => updateStatus(order.id, e.target.value)}
-                  className="border border-gray-200 text-sm py-1 px-2 focus:outline-none focus:border-black rounded-sm"
-                >
-                  <option value="Pending">Pending / Belum Bayar</option>
-                  <option value="Paid">Paid / Perlu Dikirim</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Shipped">Shipped / Dikirim</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
+                
+                <div className="flex flex-wrap items-center gap-2 w-full mt-2">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-500 mr-4 min-w-[120px]">
+                    Status: {(() => {
+                              switch (order.status) {
+                                case 'Pending': return <span className="inline-block bg-yellow-100 text-yellow-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Belum Bayar</span>;
+                                case 'Paid': return <span className="inline-block bg-blue-100 text-blue-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Menunggu Pengiriman</span>;
+                                case 'Processing': return <span className="inline-block bg-indigo-100 text-indigo-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Diproses</span>;
+                                case 'Shipped': return <span className="inline-block bg-purple-100 text-purple-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Dikirim</span>;
+                                case 'Delivered': return <span className="inline-block bg-green-100 text-green-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Selesai</span>;
+                                case 'Cancelled': return <span className="inline-block bg-red-100 text-red-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">Dibatalkan</span>;
+                                default: return <span className="inline-block bg-gray-100 text-gray-800 text-[10px] px-2 py-1 uppercase tracking-widest font-bold ml-2">{order.status}</span>;
+                              }
+                            })()}
+                  </span>
+                  
+                  {order.status !== 'Shipped' && order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                    <button 
+                      onClick={() => updateStatus(order.id, 'Shipped')}
+                      className="px-3 py-1.5 bg-black text-white text-xs uppercase tracking-widest font-semibold hover:bg-gray-800 transition-colors"
+                    >
+                      Kirim Pesanan
+                    </button>
+                  )}
+                  {order.status === 'Shipped' && (
+                    <button 
+                      onClick={() => updateStatus(order.id, 'Delivered')}
+                      className="px-3 py-1.5 bg-green-600 text-white text-xs uppercase tracking-widest font-semibold hover:bg-green-700 transition-colors"
+                    >
+                      Selesaikan
+                    </button>
+                  )}
+                  {order.status !== 'Cancelled' && order.status !== 'Delivered' && (
+                    <button 
+                      onClick={() => updateStatus(order.id, 'Cancelled')}
+                      className="px-3 py-1.5 border border-red-200 text-red-600 text-xs uppercase tracking-widest font-semibold hover:bg-red-50 transition-colors"
+                    >
+                      Batalkan
+                    </button>
+                  )}
+                </div>
+
               </div>
             </div>
           ))}

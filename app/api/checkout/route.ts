@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       console.warn("XENDIT_SECRET_KEY is missing, returning mock redirect.");
       return NextResponse.json({ 
         success: true, 
-        invoiceUrl: `/checkout/payment-simulation?orderId=${orderId}invoiceUrl: '/account', // Redirect locally for demoamount=${Number(total) + shippingCost}`,
+        invoiceUrl: `/checkout/payment-simulation?orderId=${orderId}&amount=${Number(total) + shippingCost}`,
         orderId 
       });
     }

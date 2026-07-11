@@ -186,7 +186,7 @@ export default function ProductPage() {
                      alert('Produk ditambahkan ke keranjang!');
                    }
                  }} className="flex-1 text-center bg-secondary text-white py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                   Add to Cart
+                   {product.stock !== undefined && product.stock <= 0 ? 'Habis' : 'Add to Cart'}
                  </button>
                  <button disabled={product.stock !== undefined && product.stock <= 0} onClick={() => {
                    let qty = 1;
@@ -203,7 +203,7 @@ export default function ProductPage() {
                    }
                    router.push(`/checkout?productId=${product.id}&qty=${qty}`);
                  }} className="flex-1 text-center bg-transparent text-secondary border border-secondary py-4 text-xs lg:text-sm uppercase tracking-widest font-semibold hover:bg-secondary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                   Beli Sekarang
+                   {product.stock !== undefined && product.stock <= 0 ? 'Habis' : 'Beli Sekarang'}
                  </button>
                  <button onClick={(e) => toggleWishlist(e, product.id)} className={`px-5 border border-gray-200 transition-colors flex items-center justify-center ${wishlist.includes(product.id) ? 'text-red-500 border-red-200' : 'hover:border-black text-gray-600'}`}>
                    <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

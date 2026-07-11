@@ -141,6 +141,11 @@ function ShopContent() {
                     />
                   )}
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {product.stock !== undefined && product.stock <= 0 && (
+                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
+                      <span className="bg-red-600 text-white px-3 py-1 text-xs font-bold uppercase tracking-widest">Habis</span>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3 w-full min-w-0">
                   <h3 className="font-serif text-sm sm:text-lg mb-1 leading-tight line-clamp-2 break-words w-full" title={product.name}>{product.name}</h3>
